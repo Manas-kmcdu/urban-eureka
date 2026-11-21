@@ -1,5 +1,5 @@
 <!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
-<title>Unrest</title>
+<title>unrest</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&family=Instrument+Sans:wght@400..700&family=DM+Mono:wght@400;500&display=swap">
 <style>
@@ -256,6 +256,8 @@ button.ctag:hover{background:var(--line)}
 /* ideas */
 .itool{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:12px}
 .itool .sp{flex:1}
+.itool .qt{display:flex;gap:6px}
+.itool .qt input{width:190px}
 .board{height:min(74vh,760px);overflow:auto;border:1px solid var(--line);background:var(--surface);background-image:radial-gradient(var(--line) 1.2px,transparent 1.3px);background-size:24px 24px;position:relative}
 .sheet{position:relative;width:1800px;height:1200px}
 .note{position:absolute;width:208px;background:var(--bg-n,var(--n1));border:1px solid color-mix(in srgb,var(--ink) 22%,transparent);box-shadow:3px 4px 0 color-mix(in srgb,var(--ink) 16%,transparent);display:flex;flex-direction:column}
@@ -264,6 +266,23 @@ button.ctag:hover{background:var(--line)}
 .nh .grip{flex:1;height:100%}
 .nh button{appearance:none;background:none;border:0;cursor:pointer;color:var(--ink2);font-size:17px;line-height:1;padding:0 5px}
 .nh .cdot{width:14px;height:14px;border-radius:50%;border:2px solid var(--ink2);padding:0;margin:0 4px}
+.nf{display:flex;align-items:center;gap:8px;padding:6px 8px;border-top:1px solid color-mix(in srgb,var(--ink) 16%,transparent);flex-wrap:wrap;min-height:36px}
+.nf form{display:grid;gap:6px;width:100%}
+.nf select,.nf input{font-size:12.5px;padding:5px 7px;background:color-mix(in srgb,var(--bg) 55%,transparent);width:100%}
+.nf .nrow{display:flex;gap:10px;align-items:center}
+.nf .send{appearance:none;background:var(--ink);color:var(--bg);border:0;padding:5px 10px;font:700 11.5px var(--f-body);cursor:pointer;transition:transform .22s cubic-bezier(.2,.8,.25,1)}
+.nf .send:hover{transform:translateX(3px)}
+.nf .sent{font:600 11px var(--f-mono);text-transform:uppercase;letter-spacing:.07em;color:var(--accent);animation:viewIn .4s both}
+.nf .lnk{appearance:none;background:none;border:0;color:var(--ink2);font:600 12px var(--f-body);text-decoration:underline;cursor:pointer;padding:0}
+.note.final{box-shadow:3px 4px 0 var(--accent);border-color:var(--accent)}
+.note.pushed{box-shadow:3px 4px 0 var(--mari);border-color:var(--mari)}
+.nf .nchips{display:flex;flex-wrap:wrap;gap:4px 8px;align-items:center;width:100%}
+.nf .pill{font:700 10.5px var(--f-mono);letter-spacing:.08em;text-transform:uppercase;background:var(--accent);color:var(--accent-ink);padding:2px 7px}
+.nf .pp{display:grid;gap:6px;width:100%}
+.nf .pm{display:flex;gap:4px}
+.nf .pm button{appearance:none;cursor:pointer;font:700 11.5px var(--f-body);padding:3px 9px;border:1px solid color-mix(in srgb,var(--ink) 30%,transparent);background:transparent;color:var(--ink)}
+.nf .pm button[aria-pressed="true"]{background:var(--ink);color:var(--bg)}
+.bfilter{margin-bottom:12px}
 .note textarea{border:0;background:transparent;resize:vertical;min-height:112px;padding:8px 10px;font:500 14px/1.4 var(--f-body);width:100%}
 .note textarea:focus-visible{outline-offset:-2px}
 .toast{position:fixed;left:50%;bottom:max(18px,env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:9px 14px;font:600 13px var(--f-body);z-index:50;opacity:0;pointer-events:none;transition:opacity .2s;max-width:90vw}
@@ -295,7 +314,7 @@ button.ctag:hover{background:var(--line)}
 <div class="wrap">
   <header class="top">
     <div class="brand">
-      <h1><span class="mark" aria-hidden="true"></span>Workstation</h1>
+      <h1><span class="mark" aria-hidden="true"></span>unrest</h1>
       <span id="today" class="mono"></span>
     </div>
     <div class="top-r">
@@ -308,7 +327,7 @@ button.ctag:hover{background:var(--line)}
     <button class="tab" role="tab" data-v="map" type="button">Campus map</button>
     <button class="tab" role="tab" data-v="todo" type="button">To-do <span class="cnt mono" id="cTodo">0</span></button>
     <button class="tab" role="tab" data-v="calendars" type="button">Calendars <span class="cnt mono" id="cCal">0</span></button>
-    <button class="tab" role="tab" data-v="ideas" type="button">Ideas <span class="cnt mono" id="cIdea">0</span></button>
+    <button class="tab" role="tab" data-v="board" type="button">Board <span class="cnt mono" id="cIdea">0</span></button>
   </nav>
 
   <section id="v-map" class="view" aria-label="Campus map">
@@ -347,7 +366,7 @@ button.ctag:hover{background:var(--line)}
 
   <section id="v-todo" class="view" aria-label="To-do list" hidden></section>
   <section id="v-calendars" class="view" aria-label="Calendars" hidden></section>
-  <section id="v-ideas" class="view" aria-label="Idea board" hidden></section>
+  <section id="v-board" class="view" aria-label="Board" hidden></section>
 </div>
 <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
@@ -473,7 +492,7 @@ var DISTRICTS=[["Narela",28.845,77.10],["Rohini",28.715,77.115],["Najafgarh",28.
 var POIS=[["Connaught Place",28.6315,77.2167],["India Gate",28.6129,77.2295],["Qutub Minar",28.5245,77.1855],["Lotus Temple",28.5535,77.2588],["IGI Airport",28.5562,77.1000]];
 
 /* ---------- state ---------- */
-var LS='workstation.v1';
+var LS='unrest.v1';
 var S=null, docRef=null;
 function defaultLabels(){return [{id:'lb-event',name:'Event',c:2},{id:'lb-meet',name:'Meeting',c:4},{id:'lb-dead',name:'Deadline',c:3},{id:'lb-post',name:'Post',c:5},{id:'lb-idea',name:'Idea',c:1}]}
 function seed(){
@@ -494,11 +513,14 @@ function seed(){
       {id:uid(),cal:cnc,d:plusDays(3),text:'Poster drop',label:'lb-post',ex:1},
       {id:uid(),cal:cnc,d:plusDays(7),text:'Recap carousel',label:'lb-post',ex:1},
       {id:uid(),cal:cnc,d:plusDays(8),text:'Caption review',label:'lb-dead',ex:1}],
+    boards:[{id:'bd-content',name:'Content board',kind:'content'},{id:'bd-event',name:'Event board',kind:'event'}],
     notes:[
-      {id:uid(),x:40,y:40,z:1,c:1,text:'Campus walk series: one college a week, shot on the same route',ex:1},
-      {id:uid(),x:290,y:70,z:2,c:2,text:'Collab with societies for the next event night',ex:1},
-      {id:uid(),x:80,y:260,z:3,c:3,text:'Printed map poster for freshers',ex:1},
-      {id:uid(),x:340,y:290,z:4,c:4,text:'Merch drop: tote + sticker pack?',ex:1}],
+      {id:uid(),b:'bd-content',st:'final',x:40,y:40,z:1,c:5,text:'Campus walk series: one college a week, shot on the same route',ex:1},
+      {id:uid(),b:'bd-content',st:'idea',x:290,y:60,z:2,c:2,text:'Reel format: 15-second college tours',ex:1},
+      {id:uid(),b:'bd-content',st:'idea',x:70,y:290,z:3,c:4,text:'Caption bank for event nights',ex:1},
+      {id:uid(),b:'bd-event',st:'final',x:40,y:40,z:4,c:1,text:'Open-mic night at North Campus',ex:1},
+      {id:uid(),b:'bd-event',st:'idea',x:290,y:70,z:5,c:3,text:'Collab with societies for a joint event night',ex:1},
+      {id:uid(),b:'bd-event',st:'idea',x:90,y:290,z:6,c:5,text:'Merch drop with a pop-up stall',ex:1}],
     zc:5};
 }
 function normalize(x){
@@ -506,6 +528,8 @@ function normalize(x){
   x.rev=+x.rev||0; x.starred=Array.isArray(x.starred)?x.starred:[]; x.todos=Array.isArray(x.todos)?x.todos:[];
   x.cals=Array.isArray(x.cals)?x.cals:[]; x.labels=Array.isArray(x.labels)&&x.labels.length?x.labels:defaultLabels();
   x.events=Array.isArray(x.events)?x.events:[]; x.notes=Array.isArray(x.notes)?x.notes:[]; x.zc=+x.zc||10;
+  if(!Array.isArray(x.boards)||!x.boards.length) x.boards=[{id:'bd-content',name:'Content board',kind:'content'},{id:'bd-event',name:'Event board',kind:'event'}];
+  x.notes.forEach(function(n){if(!n.b||!x.boards.some(function(b){return b.id===n.b})) n.b=x.boards[0].id;if(!n.st) n.st='idea'});
   return x;
 }
 function loadLocal(){try{var t=localStorage.getItem(LS);return t?JSON.parse(t):null}catch(_){return null}}
@@ -534,7 +558,7 @@ async function initRemote(){
     var db=await window.claude.use('db'), user=await window.claude.use('user');
     if(!db||!user) return;
     var id=await user.id(); if(!id) return;
-    docRef=db.doc('data/users/'+id+'/workstation');
+    docRef=db.doc('data/users/'+id+'/unrest');
     var first=true;
     var timer=setTimeout(function(){if(first)setStatus('local')},10000);
     docRef.onSnapshot(function(snap){
@@ -554,8 +578,8 @@ async function initRemote(){
 }
 
 /* ---------- ui state ---------- */
-var VIEWS=['map','todo','calendars','ideas'];
-var ui={view:'map',zone:'All',q:'',sel:null,tf:'all',cal:null,pm:{y:TODAY.getFullYear(),m:TODAY.getMonth()},nname:'',selDate:null,lab:null,newC:6,addLab:false,labC:6,delArm:false};
+var VIEWS=['map','todo','calendars','board'];
+var ui={view:'map',zone:'All',q:'',sel:null,tf:'all',cal:null,pm:{y:TODAY.getFullYear(),m:TODAY.getMonth()},nname:'',selDate:null,lab:null,newC:6,addLab:false,labC:6,delArm:false,board:null,bf:'all',addBoard:false};
 
 function updateChrome(){
   $('#cTodo').textContent=S.todos.filter(function(t){return !t.done}).length;
@@ -569,10 +593,11 @@ function renderAll(){
   if(ui.view==='map') renderMapPanel();
   if(ui.view==='todo') renderTodo();
   if(ui.view==='calendars') renderCal();
-  if(ui.view==='ideas') renderIdeas();
+  if(ui.view==='board') renderIdeas();
 }
 function route(){
   var hsh=(location.hash||'#map').slice(1);
+  if(hsh==='ideas') hsh='board';
   ui.view=VIEWS.indexOf(hsh)>-1?hsh:'map';
   VIEWS.forEach(function(v){
     $('#v-'+v).hidden=(v!==ui.view);
@@ -1040,18 +1065,122 @@ function renderCal(){
   root.append(nav,shelf,tear,h('div',{class:'cal-grid'},h('div',null,pad,labels,h('div',{style:'margin-top:12px'},delBtn)),day));
 }
 
-/* =====================  IDEAS  ===================== */
+/* =====================  BOARD  ===================== */
+function nLinks(n){
+  return {todo:!!n.todo&&S.todos.some(function(t){return t.id===n.todo}),ev:!!n.ev&&S.events.some(function(e){return e.id===n.ev})};
+}
+function nStatus(n){var l=nLinks(n);return (l.todo||l.ev)?'pushed':(n.st==='final'?'final':'idea')}
+function activeBoard(){var b=S.boards.find(function(x){return x.id===ui.board});if(!b) b=S.boards[0];ui.board=b.id;return b}
+function kindColor(k){return k==='event'?2:k==='content'?5:6}
+function newCalName(bd){return bd.kind==='event'?'Event calendar':bd.kind==='content'?'Content calendar':bd.name+' calendar'}
+function defaultLabel(bd){var id=bd.kind==='content'?'lb-post':bd.kind==='event'?'lb-event':null;return S.labels.some(function(l){return l.id===id})?id:S.labels[0].id}
+function firstLine(t){return t.trim().split('\n')[0].slice(0,80)}
+function calsForDate(dk){var a=dk.split('-').map(Number);return S.cals.filter(function(c){return c.y===a[0]&&c.m===a[1]-1})}
+function pushToCal(n,bd,dk,calId,labId){
+  var a=dk.split('-').map(Number),cal=S.cals.find(function(c){return c.id===calId});
+  if(!cal||cal.y!==a[0]||cal.m!==a[1]-1){
+    cal={id:uid(),name:newCalName(bd),c:kindColor(bd.kind),y:a[0],m:a[1]-1};S.cals.push(cal);
+  }
+  var ev={id:uid(),cal:cal.id,d:dk,text:firstLine(n.text),label:labId};
+  S.events.push(ev);n.ev=ev.id;
+  return {cal:cal,ev:ev};
+}
 function renderIdeas(){
-  var root=$('#v-ideas');root.textContent='';
+  var root=$('#v-board');root.textContent='';
+  var bd=activeBoard();
+  var mine=S.notes.filter(function(n){return n.b===bd.id});
+  var cnt={all:mine.length,idea:0,final:0,pushed:0};
+  mine.forEach(function(n){cnt[nStatus(n)]++});
   var sheet=h('div',{class:'sheet'});
   var board=h('div',{class:'board',id:'board'},sheet);
+
   function noteEl(n){
     var ta=h('textarea',{'aria-label':'Idea',placeholder:'Type an idea',value:n.text,maxlength:'600'});
     var nh=h('div',{class:'nh'},
       h('button',{class:'cdot',type:'button','aria-label':'Change colour',style:'background:var(--n'+n.c+')',onclick:function(e){e.stopPropagation();n.c=n.c%5+1;el.style.setProperty('--bg-n','var(--n'+n.c+')');e.currentTarget.style.background='var(--n'+n.c+')';commit()}}),
       h('span',{class:'grip'}),
-      h('button',{type:'button','aria-label':'Delete note',onclick:function(e){e.stopPropagation();S.notes=S.notes.filter(function(x){return x!==n});commit();el.remove();updateChrome()},text:'×'}));
-    var el=h('div',{class:'note',style:'left:'+n.x+'px;top:'+n.y+'px;z-index:'+n.z+';--bg-n:var(--n'+n.c+')'},nh,ta);
+      h('button',{type:'button','aria-label':'Delete note',onclick:function(e){e.stopPropagation();S.notes=S.notes.filter(function(x){return x!==n});commit();renderIdeas()},text:'×'}));
+    var foot=h('div',{class:'nf'});
+    var el=h('div',{class:'note',style:'left:'+n.x+'px;top:'+n.y+'px;z-index:'+n.z+';--bg-n:var(--n'+n.c+')'},nh,ta,foot);
+    var pushOpen=false,mode='todo';
+
+    function needText(){
+      var v=ta.value.trim();
+      if(!v){toast('Write the idea first');ta.focus();return null}
+      n.text=ta.value;return v;
+    }
+    function pushPanel(lk){
+      if(mode==='todo'&&lk.todo) mode='cal';
+      if(mode==='cal'&&lk.ev) mode='todo';
+      var form=h('form',{class:'pp'});
+      var modes=h('div',{class:'pm'},
+        lk.todo?null:h('button',{type:'button','aria-pressed':String(mode==='todo'),onclick:function(){mode='todo';drawFoot()},text:'To-do'}),
+        lk.ev?null:h('button',{type:'button','aria-pressed':String(mode==='cal'),onclick:function(){mode='cal';drawFoot()},text:'Calendar'}));
+      form.append(modes);
+      if(mode==='todo'){
+        var sel=h('select',{'aria-label':'College (optional)'},h('option',{value:'',text:'No college'}),COL.map(function(c){return h('option',{value:c.name,text:c.short})}));
+        var due=h('input',{type:'date','aria-label':'Due date (optional)'});
+        form.append(sel,due,h('div',{class:'nrow'},
+          h('button',{class:'send',type:'submit',text:'Push to to-do'}),
+          h('button',{class:'lnk',type:'button',onclick:function(){pushOpen=false;drawFoot()},text:'Cancel'})));
+        form.addEventListener('submit',function(e){
+          e.preventDefault();var v=needText();if(!v) return;
+          var t={id:uid(),text:v,tag:sel.value,due:due.value,done:false};
+          S.todos.unshift(t);n.todo=t.id;commit();pushOpen=false;renderIdeas();toast('Pushed to your to-do list');
+        });
+      } else {
+        var dt=h('input',{type:'date','aria-label':'Date on the calendar'});
+        var cs=h('select',{'aria-label':'Calendar'});
+        var ls=h('select',{'aria-label':'Label'},S.labels.map(function(l){return h('option',{value:l.id,text:l.name})}));
+        ls.value=defaultLabel(bd);
+        var fill=function(){
+          cs.textContent='';
+          if(!dt.value){cs.append(h('option',{value:'',text:'Pick a date first'}));return}
+          var a=dt.value.split('-').map(Number),list=calsForDate(dt.value);
+          list.forEach(function(c){cs.append(h('option',{value:c.id,text:c.name}))});
+          cs.append(h('option',{value:'__new',text:'New: '+newCalName(bd)+' ('+MONTHS[a[1]-1].slice(0,3)+' '+a[0]+')'}));
+          var pref=list.find(function(c){return c.name.toLowerCase().indexOf(bd.kind)>-1});
+          cs.value=pref?pref.id:(list[0]?list[0].id:'__new');
+        };
+        dt.addEventListener('change',fill);fill();
+        form.append(dt,cs,ls,h('div',{class:'nrow'},
+          h('button',{class:'send',type:'submit',text:'Push to calendar'}),
+          h('button',{class:'lnk',type:'button',onclick:function(){pushOpen=false;drawFoot()},text:'Cancel'})));
+        form.addEventListener('submit',function(e){
+          e.preventDefault();var v=needText();if(!v) return;
+          if(!dt.value){toast('Pick a date');dt.focus();return}
+          var r=pushToCal(n,bd,dt.value,cs.value,ls.value);
+          commit();pushOpen=false;renderIdeas();toast('Added to '+r.cal.name+' on '+fmt(r.ev.d));
+        });
+      }
+      return form;
+    }
+    function drawFoot(){
+      foot.textContent='';
+      var st=nStatus(n),lk=nLinks(n);
+      el.classList.toggle('final',st==='final');
+      el.classList.toggle('pushed',st==='pushed');
+      var chips=h('div',{class:'nchips'});
+      if(lk.todo) chips.append(h('span',{class:'sent',text:'In to-do'}),h('button',{class:'lnk',type:'button',onclick:function(){location.hash='todo'},text:'View'}));
+      if(lk.ev){
+        var ev=S.events.find(function(e){return e.id===n.ev}),cal=S.cals.find(function(c){return c.id===ev.cal});
+        chips.append(h('span',{class:'sent',text:(cal?cal.name:'Calendar')+' · '+fmt(ev.d)}),
+          h('button',{class:'lnk',type:'button',onclick:function(){if(cal){ui.pm={y:cal.y,m:cal.m};ui.cal=cal.id;ui.selDate=ev.d}location.hash='calendars'},text:'View'}));
+      }
+      if(chips.childNodes.length) foot.append(chips);
+      if(st==='idea'){
+        foot.append(h('button',{class:'send',type:'button',onclick:function(){if(!needText()) return;n.st='final';commit();renderIdeas()},text:'Finalise ✓'}));
+      } else if(pushOpen){
+        foot.append(pushPanel(lk));
+      } else {
+        var row=h('div',{class:'nrow'});
+        if(st==='final') row.append(h('span',{class:'pill',text:'Final'}));
+        if(!lk.todo||!lk.ev) row.append(h('button',{class:'send',type:'button',onclick:function(){pushOpen=true;mode=lk.todo?'cal':'todo';drawFoot()},text:'Push →'}));
+        if(st==='final') row.append(h('button',{class:'lnk',type:'button',onclick:function(){n.st='idea';commit();renderIdeas()},text:'Reopen'}));
+        foot.append(row);
+      }
+    }
+    drawFoot();
     var t=0;ta.addEventListener('input',function(){n.text=ta.value;clearTimeout(t);t=setTimeout(commit,500)});
     var drag=null;
     nh.addEventListener('pointerdown',function(e){
@@ -1062,21 +1191,44 @@ function renderIdeas(){
     });
     nh.addEventListener('pointermove',function(e){
       if(!drag) return;
-      n.x=clamp(drag.nx+e.clientX-drag.x,0,1800-208);n.y=clamp(drag.ny+e.clientY-drag.y,0,1200-60);
+      n.x=clamp(drag.nx+e.clientX-drag.x,0,1800-208);n.y=clamp(drag.ny+e.clientY-drag.y,0,1200-90);
       el.style.left=n.x+'px';el.style.top=n.y+'px';
     });
     var up=function(){if(!drag) return;drag=null;nh.classList.remove('go');commit()};
     nh.addEventListener('pointerup',up);nh.addEventListener('pointercancel',up);
     return el;
   }
-  S.notes.forEach(function(n){sheet.append(noteEl(n))});
+  mine.forEach(function(n){if(ui.bf==='all'||nStatus(n)===ui.bf) sheet.append(noteEl(n))});
+
+  var tabs=h('div',{class:'shelf'},
+    S.boards.map(function(b){return h('button',{class:'ctab'+(b.id===bd.id?' on':''),type:'button',style:'--c:var(--l'+kindColor(b.kind)+')',
+      onclick:function(){ui.board=b.id;ui.bf='all';renderIdeas()},text:b.name+' · '+S.notes.filter(function(n){return n.b===b.id}).length})}),
+    h('button',{class:'btn',type:'button',onclick:function(){ui.addBoard=!ui.addBoard;renderIdeas()},text:'+ Board'}));
+  var addForm=null;
+  if(ui.addBoard){
+    var bn=h('input',{id:'bname',type:'text',placeholder:'Board name, e.g. Podcast ideas','aria-label':'Board name'});
+    var bk=h('select',{'aria-label':'Board type'},[['content','Content'],['event','Event'],['other','Other']].map(function(k){return h('option',{value:k[0],text:k[1]})}));
+    addForm=h('form',{class:'newcal',onsubmit:function(e){e.preventDefault();var v=bn.value.trim();if(!v){bn.focus();return}
+      var b={id:uid(),name:v,kind:bk.value};S.boards.push(b);ui.board=b.id;ui.bf='all';ui.addBoard=false;commit();renderIdeas()}},
+      bn,bk,h('button',{class:'btn primary',type:'submit',text:'Create'}),
+      h('button',{class:'btn ghost',type:'button',onclick:function(){ui.addBoard=false;renderIdeas()},text:'Cancel'}));
+  }
+  var labelsF={all:'All',idea:'Ideas',final:'Final',pushed:'Pushed'};
+  var filters=h('div',{class:'chips',role:'group','aria-label':'Show'},Object.keys(labelsF).map(function(f){
+    return h('button',{class:'chip',type:'button','aria-pressed':String(ui.bf===f),onclick:function(){ui.bf=f;renderIdeas()},text:labelsF[f]+' '+cnt[f]})}));
+  var qt=h('input',{id:'qtodo',type:'text',placeholder:'Quick to-do','aria-label':'Quick to-do'});
   var bar=h('div',{class:'itool'},
-    h('div',null,h('h2',{class:'h2',text:'Idea board'}),h('p',{class:'sub',text:'Drag a note by its top strip. The dot changes its colour.'})),
+    h('div',null,h('h2',{class:'h2',text:bd.name}),h('p',{class:'sub',text:'Park ideas, finalise the good ones, then push them to the to-do list or a calendar.'})),
     h('span',{class:'sp'}),
+    h('form',{class:'qt',onsubmit:function(e){e.preventDefault();var v=qt.value.trim();if(!v)return;
+      S.todos.unshift({id:uid(),text:v,tag:'',due:'',done:false});commit();qt.value='';toast('Added to your to-do list')}},
+      qt,h('button',{class:'btn',type:'submit',text:'Add to-do'})),
     h('button',{class:'btn primary',type:'button',onclick:function(){
-      var n={id:uid(),x:Math.round(board.scrollLeft+30+Math.random()*120),y:Math.round(board.scrollTop+30+Math.random()*100),z:++S.zc,c:(S.notes.length%5)+1,text:''};
-      S.notes.push(n);commit();var el=noteEl(n);sheet.append(el);el.querySelector('textarea').focus()},text:'+ Note'}));
-  root.append(bar,board);
+      var n={id:uid(),b:bd.id,st:'idea',x:Math.round(board.scrollLeft+30+Math.random()*120),y:Math.round(board.scrollTop+30+Math.random()*100),z:++S.zc,c:(S.notes.length%5)+1,text:''};
+      S.notes.push(n);commit();ui.bf='all';renderIdeas();
+      var tas=$('#board').querySelectorAll('textarea');if(tas.length) tas[tas.length-1].focus()},text:'+ Idea'}));
+  root.append(tabs);if(addForm) root.append(addForm);
+  root.append(bar,h('div',{class:'bfilter'},filters),board);
 }
 
 /* ---------- boot ---------- */
