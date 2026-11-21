@@ -1,0 +1,1091 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Workstation</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&family=Instrument+Sans:wght@400..700&family=DM+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: a drafting desk on black. One rail with four tabs; each tab is a sheet.
+   Map = transit-style plan of Delhi with colleges as colour-coded tags. Calendars = tear-off wall pads. Ideas = stickies on a dotted board. */
+:root{
+  color-scheme:dark;
+  --bg:#000000; --surface:#0B0C0B; --surface2:#151816; --ink:#EEF0EB; --ink2:#8E9890; --line:#2A2E2B;
+  --accent:#47D3AE; --accent-ink:#04201A; --mari:#FFC42E; --danger:#FF7A66;
+  --land:#080B09; --water:#12394A; --ridge:#17361F; --halo:#000000;
+  --w:#E0434F; --co:#2F73E0; --lblue:#3AA6FF; --lred:#FF5252; --lyel:#FFC400; --lvio:#A878FF;
+  --n1:#5B4A12; --n2:#1F4A38; --n3:#5A2A2E; --n4:#26426A; --n5:#43386C;
+  --l1:#F0B93A; --l2:#3FC7A3; --l3:#FF9A6B; --l4:#93A9FF; --l5:#F28DC6; --l6:#A9B8B0;
+  --f-display:'Bricolage Grotesque','Trebuchet MS','Segoe UI',sans-serif;
+  --f-body:'Instrument Sans','Segoe UI','Helvetica Neue',Arial,sans-serif;
+  --f-mono:'DM Mono','SFMono-Regular',Consolas,'Liberation Mono',monospace;
+}
+*{box-sizing:border-box}
+em,i,cite,address,dfn{font-style:normal}
+body{background:var(--bg);color:var(--ink);font:15px/1.45 var(--f-body);margin:0;
+  padding-block:0 56px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.wrap{max-width:1280px;margin:0 auto}
+.mono{font-family:var(--f-mono)}
+button{font:inherit;color:inherit}
+input,select,textarea{font:inherit;font-style:normal;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:8px 10px;min-width:0}
+input::placeholder,textarea::placeholder{font-style:normal;color:var(--ink2);opacity:.8}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.btn{font:600 13px var(--f-body);padding:8px 12px;border-radius:6px;border:1px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer;white-space:nowrap}
+.btn:hover{border-color:var(--ink2)}
+.btn.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.btn.ghost{background:transparent}
+.btn.danger{color:var(--danger)}
+.btn[disabled]{opacity:.45;cursor:not-allowed}
+
+/* header + tabs */
+.top{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px 16px;padding-top:18px}
+.brand{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}
+.brand h1{font:700 30px/1 var(--f-display);letter-spacing:-.015em;margin:0;display:flex;align-items:center;gap:10px}
+.mark{display:inline-block;width:14px;height:14px;background:var(--accent);box-shadow:5px 5px 0 var(--mari)}
+.brand .mono{font-size:12px;color:var(--ink2);letter-spacing:.06em;text-transform:uppercase}
+.top-r{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.sync{font:500 11.5px var(--f-mono);color:var(--ink2);display:flex;align-items:center;gap:6px}
+.sync::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--ink2)}
+.sync[data-k="synced"]::before{background:var(--accent)}
+.sync[data-k="saving"]::before{background:var(--mari)}
+.tabs{display:flex;gap:2px;margin-top:14px;border-bottom:1px solid var(--line);overflow-x:auto}
+.tab{appearance:none;background:none;border:0;border-bottom:3px solid transparent;padding:10px 14px 9px;font:600 14px var(--f-body);color:var(--ink2);cursor:pointer;white-space:nowrap;display:flex;gap:8px;align-items:center}
+.tab[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--accent)}
+.tab .cnt{font:500 11px var(--f-mono);background:var(--surface2);padding:1px 6px;border-radius:9px;color:var(--ink2)}
+.view{padding-top:16px}
+.view[hidden]{display:none!important}
+.h2{font:700 20px/1.2 var(--f-display);margin:0 0 4px;letter-spacing:-.01em}
+.sub{color:var(--ink2);font-size:13px;margin:0}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{appearance:none;border:1px solid var(--line);background:var(--surface);border-radius:14px;padding:3px 10px;font:600 12px var(--f-body);cursor:pointer;color:var(--ink2)}
+.chip[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.exchip{font:500 10px var(--f-mono);text-transform:uppercase;letter-spacing:.08em;border:1px dashed var(--ink2);color:var(--ink2);padding:0 5px;border-radius:3px}
+
+/* map */
+.map-grid{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:16px}
+.mapwrap{position:relative;height:clamp(420px,74vh,820px);border:1px solid var(--line);background:var(--bg);overflow:hidden;touch-action:none}
+#mapsvg{display:block;width:100%;height:100%;cursor:grab;user-select:none;-webkit-user-select:none}
+#mapsvg.drag{cursor:grabbing}
+.m-bg{fill:var(--bg)}
+.m-grid{fill:none;stroke:var(--line);stroke-width:.6;opacity:.5}
+.m-land{fill:var(--land);stroke:var(--ink2);stroke-width:1.2;stroke-dasharray:6 5;vector-effect:non-scaling-stroke;stroke-linejoin:round;opacity:.9}
+.m-river{fill:none;stroke:var(--water);stroke-width:10;stroke-linecap:round;stroke-linejoin:round;vector-effect:non-scaling-stroke}
+.m-ridge{fill:none;stroke:var(--ridge);stroke-width:14;stroke-linecap:round;stroke-linejoin:round;vector-effect:non-scaling-stroke}
+.m-line{fill:none;stroke-width:4;stroke-linecap:round;stroke-linejoin:round;vector-effect:non-scaling-stroke}
+.m-line.blue{stroke:var(--lblue)}
+.m-line.red{stroke:var(--lred)}
+.m-line.yel{stroke:var(--lyel)}
+.m-line.vio{stroke:var(--lvio)}
+.m-dist{font:500 10.5px var(--f-mono);letter-spacing:.16em;text-transform:uppercase;fill:var(--ink2);text-anchor:middle;pointer-events:none;opacity:.8}
+.m-sd{fill:#fff;stroke:#000;stroke-width:1.4}
+.m-st{font:600 10.5px var(--f-body);fill:var(--ink);pointer-events:none;paint-order:stroke;stroke:var(--halo);stroke-width:3.4px;stroke-linejoin:round}
+.m-poi{font:500 10px var(--f-mono);fill:var(--ink2);pointer-events:none;paint-order:stroke;stroke:var(--halo);stroke-width:3px;letter-spacing:.04em}
+.m-c{cursor:pointer}
+.m-c .bx{fill:var(--co);stroke:#000;stroke-width:1}
+.m-c.w .bx{fill:var(--w)}
+.m-c .bt{font:600 11px var(--f-body);fill:#fff;pointer-events:none;dominant-baseline:central}
+.m-c .dt{fill:var(--co);stroke:#fff;stroke-width:1.6}
+.m-c.w .dt{fill:var(--w)}
+.m-c .ld{stroke:var(--ink2);stroke-width:1}
+.m-c.star .bx{stroke:var(--mari);stroke-width:2.6}
+.m-c.star .dt{stroke:var(--mari);stroke-width:2.6}
+.m-c.sel .bx,.m-c.sel .dt{stroke:#fff;stroke-width:3}
+.m-c:focus-visible{outline:none}
+.m-c:focus-visible .bx,.m-c:focus-visible .dt{stroke:var(--accent);stroke-width:3}
+.m-camp{cursor:pointer}
+.m-camp .bx{fill:var(--mari);stroke:#000;stroke-width:1.5}
+.m-camp .bt{font:800 12px var(--f-display);fill:#000;letter-spacing:.04em;dominant-baseline:central;pointer-events:none}
+.m-camp .mk{fill:var(--w);stroke:#fff;stroke-width:1.6}
+.m-camp .ld{stroke:var(--mari);stroke-width:1.6}
+.m-camp:focus-visible{outline:none}
+.m-camp:focus-visible .bx{stroke:var(--accent);stroke-width:3}
+.zoom{position:absolute;top:10px;right:10px;display:flex;flex-direction:column;gap:6px}
+.zoom .btn{min-width:44px;padding:8px 0;text-align:center}
+.legend{position:absolute;background:var(--surface);border:1px solid var(--line);padding:8px 10px;display:grid;gap:5px;font:500 11.5px var(--f-body);color:var(--ink2);max-width:calc(100% - 90px)}
+.legend-k{left:10px;top:10px}
+.legend-m{left:10px;bottom:10px}
+.legend .lh{color:var(--ink);font:700 12px var(--f-display)}
+.legend span{display:flex;align-items:center;gap:8px}
+.legend i.p{display:inline-block;width:12px;height:12px;border-radius:2px;background:var(--co);flex:none}
+.legend i.p.w{background:var(--w)}
+.legend i.p.s{background:var(--surface);border:2px solid var(--mari)}
+.legend u{display:inline-block;width:20px;height:4px;border-radius:2px;flex:none}
+.legend u.blue{background:var(--lblue)}
+.legend u.red{background:var(--lred)}
+.legend u.yel{background:var(--lyel)}
+.legend u.vio{background:var(--lvio)}
+.hint{position:absolute;right:10px;bottom:10px;font:500 10.5px var(--f-mono);color:var(--ink2);background:var(--surface);border:1px solid var(--line);padding:3px 7px}
+.side{display:flex;flex-direction:column;gap:12px;min-width:0}
+.card{background:var(--surface);border:1px solid var(--line);padding:14px;display:grid;gap:10px;border-radius:4px}
+.card h3{font:700 18px/1.2 var(--f-display);margin:0}
+.card .meta{font:500 12px var(--f-mono);color:var(--ink2);letter-spacing:.03em}
+.card .row{display:flex;gap:8px;flex-wrap:wrap}
+.card form{display:flex;gap:6px}
+.card form input{flex:1}
+.clist{list-style:none;margin:0;padding:0;overflow:auto;max-height:calc(clamp(420px,74vh,820px) - 190px);border:1px solid var(--line);background:var(--surface)}
+.clist li{display:flex;align-items:stretch;border-bottom:1px solid var(--line)}
+.clist li:last-child{border-bottom:0}
+.clist .pick{flex:1;min-width:0;text-align:left;background:none;border:0;border-left:4px solid var(--co);padding:9px 12px;cursor:pointer;display:grid;gap:1px}
+.clist li.w .pick{border-left-color:var(--w)}
+.clist .pick:hover,.clist li.on .pick{background:var(--surface2)}
+.clist .nm{font-weight:600;font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.clist .ar{font:500 11px var(--f-mono);color:var(--ink2)}
+.clist .st{width:44px;background:none;border:0;cursor:pointer;font-size:17px;color:var(--ink2)}
+.clist .st[aria-pressed="true"]{color:var(--mari)}
+.empty{padding:18px 14px;color:var(--ink2);font-size:13px}
+
+/* todo */
+.thead{display:flex;flex-wrap:wrap;align-items:center;gap:16px;margin-bottom:14px}
+.thead .grow{flex:1;min-width:200px}
+.ring{flex:none}
+.ring .rb{fill:none;stroke:var(--surface2);stroke-width:6}
+.ring .rf{fill:none;stroke:var(--accent);stroke-width:6;stroke-linecap:round;stroke-dashoffset:var(--o);animation:ringIn 1.1s cubic-bezier(.2,.8,.25,1) both}
+.ring text{font:700 13px var(--f-mono);fill:var(--ink);text-anchor:middle;dominant-baseline:central}
+@keyframes ringIn{from{stroke-dashoffset:var(--c)}}
+.tbar{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:8px;margin-bottom:14px}
+.tgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(214px,1fr));gap:16px}
+.tcard{--tc:var(--accent);position:relative;display:flex;flex-direction:column;min-height:310px;background:var(--surface);border:1px solid var(--line);border-radius:4px;overflow:hidden;
+  transition:transform .28s cubic-bezier(.2,.8,.25,1),box-shadow .28s,border-color .28s,opacity .3s}
+.tcard.enter{animation:cardIn .6s cubic-bezier(.2,.8,.25,1) both;animation-delay:calc(var(--i,0)*55ms)}
+.tcard:hover{transform:translateY(-5px);box-shadow:0 16px 30px rgba(0,0,0,.65);border-color:var(--tc)}
+.tcard .top{padding:16px 16px 14px;background:color-mix(in srgb,var(--tc) 20%,var(--surface));border-bottom:1px solid var(--line);display:grid;gap:3px;position:relative;overflow:hidden}
+.tcard .top::after{content:"";position:absolute;right:-26px;top:-26px;width:96px;height:96px;border-radius:50%;background:var(--tc);opacity:.16;transition:transform .5s cubic-bezier(.2,.8,.25,1)}
+.tcard:hover .top::after{transform:scale(1.5)}
+.tcard .big{font:800 62px/.88 var(--f-display);letter-spacing:-.035em;color:var(--tc)}
+.tcard .mon{font:500 12px var(--f-mono);letter-spacing:.1em;text-transform:uppercase;color:var(--ink2)}
+.tcard .status{font:600 11px var(--f-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--tc);margin-top:6px}
+.tcard .body{flex:1;padding:16px;display:flex;flex-direction:column;gap:12px;align-items:flex-start}
+.tcard .title{font:700 20px/1.2 var(--f-display);letter-spacing:-.01em;overflow-wrap:anywhere}
+.ctag{appearance:none;display:inline-flex;align-items:center;font:600 12px var(--f-body);color:var(--ink);background:var(--surface2);border:0;border-left:4px solid var(--co);padding:3px 9px;cursor:pointer;text-align:left}
+.ctag.w{border-left-color:var(--w)}
+span.ctag{cursor:default}
+button.ctag:hover{background:var(--line)}
+.tcard .foot{display:flex;justify-content:space-between;align-items:center;padding:10px 12px;border-top:1px solid var(--line)}
+.tick{appearance:none;display:inline-flex;align-items:center;gap:9px;background:none;border:0;cursor:pointer;font:600 13px var(--f-body);color:var(--ink);padding:4px 2px}
+.tick .ck{width:22px;height:22px;border-radius:50%;border:2px solid var(--ink2);display:inline-flex;align-items:center;justify-content:center;transition:background .25s,border-color .25s,transform .25s}
+.tick .ck::after{content:"";width:6px;height:11px;border:solid var(--accent-ink);border-width:0 2.5px 2.5px 0;transform:rotate(45deg) scale(0);margin-top:-2px;transition:transform .3s cubic-bezier(.2,1.6,.4,1)}
+.tick:hover .ck{border-color:var(--tc);transform:scale(1.1)}
+.tick.on .ck{background:var(--accent);border-color:var(--accent)}
+.tick.on .ck::after{transform:rotate(45deg) scale(1)}
+.tcard.done{--tc:var(--ink2)}
+.tcard.done .title{text-decoration:line-through;color:var(--ink2)}
+.tcard.done .big{opacity:.55}
+.tcard.done::after{content:"DONE";position:absolute;right:14px;top:92px;transform:rotate(-12deg);font:800 22px var(--f-display);letter-spacing:.06em;color:var(--accent);border:3px solid var(--accent);padding:1px 10px;opacity:.85;pointer-events:none}
+.tcard.pop::after{animation:stamp .55s cubic-bezier(.2,1.5,.4,1) both}
+.tcard.over{--tc:var(--danger)}
+.tcard.soon{--tc:var(--mari)}
+.tcard.later{--tc:var(--accent)}
+.tcard.none{--tc:var(--l6)}
+.tcard.out{animation:cardOut .26s ease-in forwards}
+.tadd{min-height:310px;border:2px dashed var(--line);border-radius:4px;padding:16px;display:flex;flex-direction:column;gap:10px;background:transparent;transition:border-color .25s}
+.tadd:hover,.tadd:focus-within{border-color:var(--accent)}
+.tadd h3{font:800 26px/1 var(--f-display);letter-spacing:-.02em;margin:0 0 4px}
+.tadd .plus{font:500 12px var(--f-mono);color:var(--ink2);letter-spacing:.08em;text-transform:uppercase}
+.tadd input,.tadd select{width:100%}
+.tadd .btn{margin-top:auto}
+@keyframes cardIn{from{opacity:0;transform:translateY(22px) scale(.95)}to{opacity:1;transform:none}}
+@keyframes cardOut{to{opacity:0;transform:scale(.82) translateY(8px)}}
+@keyframes stamp{from{opacity:0;transform:rotate(-12deg) scale(2.6)}to{opacity:.85;transform:rotate(-12deg) scale(1)}}
+@keyframes viewIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.view:not([hidden]){animation:viewIn .42s cubic-bezier(.2,.8,.25,1) both}
+.x{appearance:none;background:none;border:0;color:var(--ink2);font-size:20px;line-height:1;cursor:pointer;padding:0 4px}
+.x:hover{color:var(--danger)}
+
+/* calendars */
+.shelf{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:14px}
+.ctab{appearance:none;background:var(--surface);border:1px solid var(--line);border-top:4px solid var(--c);padding:7px 14px;font:600 13px var(--f-body);cursor:pointer;color:var(--ink2)}
+.ctab.on{color:var(--ink);background:var(--surface);border-color:var(--ink2);border-top-color:var(--c)}
+.newcal{display:flex;flex-wrap:wrap;gap:8px;align-items:center;background:var(--surface);border:1px solid var(--line);padding:10px;margin-bottom:14px}
+.newcal input[type=text]{flex:1 1 200px}
+.dots{display:flex;gap:6px}
+.dot{appearance:none;width:22px;height:22px;border-radius:50%;border:2px solid transparent;background:var(--c);cursor:pointer;padding:0}
+.dot[aria-pressed="true"]{border-color:var(--ink);box-shadow:0 0 0 2px var(--surface) inset}
+.cal-grid{display:grid;grid-template-columns:minmax(0,1fr) 310px;gap:20px;align-items:start}
+.padbar{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px;align-items:center}
+.padbar .sp{flex:1}
+.padbar select{min-width:210px;font-weight:600}
+.newcal .chips{flex:1 1 100%}
+.padstage{position:relative;padding-bottom:18px}
+.padback{position:absolute;top:30px;bottom:0;background:var(--surface2);border:1px solid var(--line)}
+.padback.b1{left:7px;right:7px;bottom:8px}
+.padback.b2{left:14px;right:14px;bottom:0}
+.pad{position:relative;z-index:2}
+.binding{height:30px;background:var(--ink);display:flex;justify-content:space-around;align-items:center;padding:0 12%}
+.binding span{width:14px;height:14px;border-radius:50%;background:var(--bg);box-shadow:inset 0 2px 3px rgba(0,0,0,.45)}
+.page{background:var(--surface);border:1px solid var(--line);border-top:0;position:relative;transform-origin:0 0}
+.page::before{content:"";display:block;border-top:3px dotted var(--line);margin:0 6px}
+.page.stick{animation:stick .56s cubic-bezier(.2,.8,.25,1) both}
+.page.torn{animation:tear .82s cubic-bezier(.5,0,.8,.4) both;box-shadow:0 14px 26px rgba(0,0,0,.28)}
+@keyframes tear{
+  0%{transform:none;opacity:1}
+  16%{transform:rotate(-1.6deg) translateY(3px);opacity:1}
+  100%{transform:translate(-22%,118%) rotate(-26deg);opacity:0}
+}
+@keyframes stick{
+  0%{transform:translate(-22%,118%) rotate(-26deg);opacity:0}
+  100%{transform:none;opacity:1}
+}
+.ph{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;padding:12px 16px 10px;border-bottom:1px solid var(--line)}
+.ph .mo{font:700 clamp(34px,7vw,58px)/.95 var(--f-display);letter-spacing:-.025em}
+.ph .yr{font:500 14px var(--f-mono);color:var(--ink2);letter-spacing:.08em}
+.ph .nm{font:700 13px var(--f-body);text-align:right;border:0;background:transparent;padding:4px 0;border-bottom:3px solid var(--c);border-radius:0;width:min(220px,44vw);text-align:right}
+.dow,.days{display:grid;grid-template-columns:repeat(7,minmax(0,1fr))}
+.dow div{font:500 11px var(--f-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--ink2);padding:7px 6px;text-align:left}
+.dow div:first-child,.cell.sun .dn{color:var(--danger)}
+.cell{appearance:none;background:var(--surface);border:0;border-top:1px solid var(--line);border-left:1px solid var(--line);min-height:92px;padding:5px 5px 4px;text-align:left;cursor:pointer;display:flex;flex-direction:column;gap:2px;min-width:0;overflow:hidden;position:relative}
+.cell:nth-child(7n+1){border-left:0}
+.cell.blank{background:var(--surface2);opacity:.45;cursor:default}
+.cell.sel{outline:2px solid var(--accent);outline-offset:-2px;z-index:1}
+.cell .dn{font:600 13px var(--f-mono);width:24px;height:24px;display:flex;align-items:center;justify-content:center;border-radius:50%}
+.cell.today .dn{background:var(--ink);color:var(--bg)}
+.ev{display:block;font:500 11px/1.3 var(--f-body);padding:1px 4px;border-left:3px solid var(--c);background:color-mix(in srgb,var(--c) 20%,var(--surface));white-space:nowrap;overflow:hidden;text-overflow:ellipsis;border-radius:2px;color:var(--ink)}
+.more{font:500 10.5px var(--f-mono);color:var(--ink2)}
+.labels{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:14px}
+.lab{display:inline-flex;align-items:center;gap:6px;font:600 12px var(--f-body);padding:3px 4px 3px 9px;border-left:4px solid var(--c);background:color-mix(in srgb,var(--c) 18%,var(--surface));color:var(--ink)}
+.lab .x{font-size:16px;padding:0 4px}
+.labform{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.labform input{width:150px}
+.daypanel{background:var(--surface);border:1px solid var(--line);padding:14px;display:grid;gap:12px;position:sticky;top:12px}
+.daypanel h3{font:700 20px/1.1 var(--f-display);margin:0}
+.daypanel ul{list-style:none;margin:0;padding:0;display:grid;gap:6px}
+.daypanel li{display:flex;gap:8px;align-items:center;padding:6px 8px;border-left:4px solid var(--c);background:color-mix(in srgb,var(--c) 14%,var(--surface))}
+.daypanel li span.t{flex:1;min-width:0;overflow-wrap:anywhere}
+.daypanel li small{font:500 10.5px var(--f-mono);color:var(--ink2);text-transform:uppercase;letter-spacing:.06em}
+.daypanel form{display:grid;gap:8px}
+.pickl{display:flex;flex-wrap:wrap;gap:6px}
+.pickl button{appearance:none;cursor:pointer;font:600 12px var(--f-body);padding:3px 9px;border:1px solid var(--line);border-left:4px solid var(--c);background:var(--surface);color:var(--ink)}
+.pickl button[aria-pressed="true"]{background:color-mix(in srgb,var(--c) 28%,var(--surface));border-color:var(--ink2);border-left-color:var(--c)}
+
+/* ideas */
+.itool{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:12px}
+.itool .sp{flex:1}
+.board{height:min(74vh,760px);overflow:auto;border:1px solid var(--line);background:var(--surface);background-image:radial-gradient(var(--line) 1.2px,transparent 1.3px);background-size:24px 24px;position:relative}
+.sheet{position:relative;width:1800px;height:1200px}
+.note{position:absolute;width:208px;background:var(--bg-n,var(--n1));border:1px solid color-mix(in srgb,var(--ink) 22%,transparent);box-shadow:3px 4px 0 color-mix(in srgb,var(--ink) 16%,transparent);display:flex;flex-direction:column}
+.nh{height:26px;display:flex;align-items:center;justify-content:space-between;padding:0 4px 0 6px;cursor:grab;touch-action:none;background:color-mix(in srgb,var(--ink) 9%,transparent)}
+.nh.go{cursor:grabbing}
+.nh .grip{flex:1;height:100%}
+.nh button{appearance:none;background:none;border:0;cursor:pointer;color:var(--ink2);font-size:17px;line-height:1;padding:0 5px}
+.nh .cdot{width:14px;height:14px;border-radius:50%;border:2px solid var(--ink2);padding:0;margin:0 4px}
+.note textarea{border:0;background:transparent;resize:vertical;min-height:112px;padding:8px 10px;font:500 14px/1.4 var(--f-body);width:100%}
+.note textarea:focus-visible{outline-offset:-2px}
+.toast{position:fixed;left:50%;bottom:max(18px,env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:9px 14px;font:600 13px var(--f-body);z-index:50;opacity:0;pointer-events:none;transition:opacity .2s;max-width:90vw}
+.toast.on{opacity:1}
+@media (max-width:900px){
+  .map-grid,.cal-grid{grid-template-columns:minmax(0,1fr)}
+  .clist{max-height:360px}
+  .daypanel{position:static}
+}
+@media (max-width:560px){
+  .brand h1{font-size:26px}
+  .cell{min-height:62px;padding:3px}
+  .ev{height:6px;padding:0;font-size:0;border-left-width:2px}
+  .dow div{padding:6px 2px;font-size:10px;letter-spacing:0}
+  .legend-m{display:none}
+  .tgrid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+  .tcard{min-height:260px}
+  .tcard .big{font-size:44px}
+  .tcard .title{font-size:17px}
+  .tcard .body,.tcard .top{padding:12px}
+  .hint{display:none}
+}
+@media (prefers-reduced-motion:reduce){
+  .page.stick,.page.torn,.view:not([hidden]),.tcard,.tcard::after,.ring .rf{animation:none!important}
+  .tcard,.tcard:hover{transition:none}
+}
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <div class="brand">
+      <h1><span class="mark" aria-hidden="true"></span>Workstation</h1>
+      <span id="today" class="mono"></span>
+    </div>
+    <div class="top-r">
+      <button id="clearEx" class="btn ghost" type="button" hidden>Clear example data</button>
+      <span id="sync" class="sync" data-k="local" role="status">Saved on this device only</span>
+    </div>
+  </header>
+
+  <nav class="tabs" role="tablist" aria-label="Sections">
+    <button class="tab" role="tab" data-v="map" type="button">Campus map</button>
+    <button class="tab" role="tab" data-v="todo" type="button">To-do <span class="cnt mono" id="cTodo">0</span></button>
+    <button class="tab" role="tab" data-v="calendars" type="button">Calendars <span class="cnt mono" id="cCal">0</span></button>
+    <button class="tab" role="tab" data-v="ideas" type="button">Ideas <span class="cnt mono" id="cIdea">0</span></button>
+  </nav>
+
+  <section id="v-map" class="view" aria-label="Campus map">
+    <div class="map-grid">
+      <div class="mapwrap" id="mapwrap">
+        <svg id="mapsvg" role="img" aria-label="Map of Delhi with Delhi University colleges"></svg>
+        <div class="zoom">
+          <button class="btn" id="zin" type="button" aria-label="Zoom in">+</button>
+          <button class="btn" id="zout" type="button" aria-label="Zoom out">&minus;</button>
+          <button class="btn" id="zfit" type="button" aria-label="Show all of Delhi">All</button>
+        </div>
+        <div class="legend legend-k" aria-hidden="true">
+          <b class="lh">Colleges and their location</b>
+          <span><i class="p w"></i>Women&rsquo;s college</span>
+          <span><i class="p"></i>Co-education college</span>
+          <span><i class="p s"></i>Starred</span>
+        </div>
+        <div class="legend legend-m" aria-hidden="true">
+          <b class="lh">Metro routes</b>
+          <span><u class="blue"></u>Blue Line &middot; Noida / Anand Vihar to Dwarka</span>
+          <span><u class="red"></u>Red Line &middot; Dilshad Garden to Rithala</span>
+          <span><u class="yel"></u>Yellow Line &middot; Samaypur Badli to HUDA City Centre</span>
+          <span><u class="vio"></u>Violet Line &middot; Central Secretariat to Badarpur</span>
+        </div>
+        <div class="hint">drag &middot; scroll to zoom</div>
+      </div>
+      <aside class="side">
+        <div id="card"></div>
+        <input id="q" type="search" placeholder="Search colleges or areas" aria-label="Search colleges or areas" autocomplete="off">
+        <div class="chips" id="zones" role="group" aria-label="Filter by part of Delhi"></div>
+        <ul class="clist" id="clist"></ul>
+        <p class="sub" id="mapnote"></p>
+      </aside>
+    </div>
+  </section>
+
+  <section id="v-todo" class="view" aria-label="To-do list" hidden></section>
+  <section id="v-calendars" class="view" aria-label="Calendars" hidden></section>
+  <section id="v-ideas" class="view" aria-label="Idea board" hidden></section>
+</div>
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+<script>
+(function(){
+'use strict';
+var reduce=!!(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches);
+var $=function(s,r){return (r||document).querySelector(s)};
+var uid=function(){return Math.random().toString(36).slice(2,9)};
+var clamp=function(v,a,b){return Math.max(a,Math.min(b,v))};
+
+function h(tag,attrs){
+  var e=document.createElement(tag);
+  if(attrs){for(var k in attrs){var v=attrs[k]; if(v==null||v===false) continue;
+    if(k==='class') e.className=v;
+    else if(k==='text') e.textContent=v;
+    else if(k.slice(0,2)==='on') e.addEventListener(k.slice(2),v);
+    else if(k==='style') e.style.cssText=v;
+    else if(k==='for'||k==='list'||k==='form'||k.indexOf('-')>-1||k==='role'||k==='tabindex'||k==='maxlength') e.setAttribute(k,v===true?'':v);
+    else if(k in e){try{e[k]=v}catch(_){e.setAttribute(k,v)}}
+    else e.setAttribute(k,v===true?'':v);}}
+  for(var i=2;i<arguments.length;i++) add(e,arguments[i]);
+  return e;
+}
+function add(e,c){ if(c==null||c===false) return; if(Array.isArray(c)){c.forEach(function(x){add(e,x)});return} e.append(c.nodeType?c:document.createTextNode(String(c))); }
+var NS='http://www.w3.org/2000/svg';
+function s(tag,attrs){
+  var e=document.createElementNS(NS,tag);
+  if(attrs){for(var k in attrs){var v=attrs[k]; if(v==null) continue;
+    if(k==='text') e.textContent=v;
+    else if(k.slice(0,2)==='on') e.addEventListener(k.slice(2),v);
+    else e.setAttribute(k,v);}}
+  for(var i=2;i<arguments.length;i++) add(e,arguments[i]);
+  return e;
+}
+function toast(msg){var t=$('#toast');t.textContent=msg;t.classList.add('on');clearTimeout(toast.t);toast.t=setTimeout(function(){t.classList.remove('on')},2200)}
+
+/* ---------- dates ---------- */
+var TODAY=new Date();
+var MONTHS=['January','February','March','April','May','June','July','August','September','October','November','December'];
+var DOWS=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+var p2=function(n){return String(n).padStart(2,'0')};
+var dkey=function(y,m,d){return y+'-'+p2(m+1)+'-'+p2(d)};
+var tkey=dkey(TODAY.getFullYear(),TODAY.getMonth(),TODAY.getDate());
+function plusDays(n){var d=new Date(TODAY.getFullYear(),TODAY.getMonth(),TODAY.getDate()+n);return dkey(d.getFullYear(),d.getMonth(),d.getDate())}
+function fmt(k){var a=k.split('-');return (+a[2])+' '+MONTHS[+a[1]-1].slice(0,3)}
+function longDate(k){var a=k.split('-').map(Number);var d=new Date(a[0],a[1]-1,a[2]);return DOWS[d.getDay()]+', '+a[2]+' '+MONTHS[a[1]-1]}
+
+/* ---------- colleges (positions are approximate, after the reference map) ---------- */
+/* name, short, area, zone, lat, lng, women's college (1), campus group (N / S) */
+var RAW=[
+["St. Stephen's College","Stephen's","North Campus","North",28.6866,77.2114,0,"N"],
+["Hindu College","Hindu","North Campus","North",28.6883,77.2119,0,"N"],
+["Hansraj College","Hansraj","North Campus","North",28.6897,77.2086,0,"N"],
+["Ramjas College","Ramjas","North Campus","North",28.6934,77.2090,0,"N"],
+["Miranda House","Miranda House","North Campus","North",28.6925,77.2123,1,"N"],
+["Kirori Mal College","KMC","North Campus","North",28.6910,77.2099,0,"N"],
+["Shri Ram College of Commerce","SRCC","Maurice Nagar","North",28.6872,77.2085,0,"N"],
+["Daulat Ram College","Daulat Ram","Maurice Nagar","North",28.6882,77.2023,1,"N"],
+["Khalsa College","Khalsa","GTB Nagar","North",28.6975,77.2060,0,"N"],
+["Indraprastha College for Women","Indraprastha","Civil Lines","North",28.6803,77.2276,1,""],
+["Satyawati College","Satyawati","Ashok Vihar","North",28.6910,77.1855,0,""],
+["Lakshmibai College","Lakshmibai","Ashok Vihar","North",28.6955,77.1810,1,""],
+["Keshav Mahavidyalaya","Keshav","Pitampura","North",28.7015,77.1310,0,""],
+["Shri Guru Gobind Singh College of Commerce","SGGSCC","Pitampura","North",28.6942,77.1363,0,""],
+["Swami Shraddhanand College","Shraddhanand","Alipur","North",28.7970,77.1330,0,""],
+["Aditi Mahavidyalaya","Aditi","Bawana","North",28.7970,77.0360,1,""],
+["Shaheed Sukhdev College of Business Studies","SSCBS","Dilshad Garden","East",28.6940,77.3040,0,""],
+["Dr. Bhim Rao Ambedkar College","Ambedkar","Yamuna Vihar","East",28.7068,77.2885,0,""],
+["Shyam Lal College","Shyam Lal","Shahdara","East",28.6740,77.2930,0,""],
+["Vivekananda College","Vivekananda","Vivek Vihar","East",28.6702,77.3153,0,""],
+["Maharaja Agrasen College","Agrasen","Vasundhara Enclave","East",28.6187,77.3010,0,""],
+["Shaheed Rajguru College of Applied Sciences for Women","Rajguru","Vasundhara Enclave","East",28.6172,77.3032,1,""],
+["Zakir Husain Delhi College","ZHDC","JLN Marg","Central",28.6398,77.2380,0,""],
+["Mata Sundri College for Women","Mata Sundri","Mata Sundri Lane","Central",28.6384,77.2410,1,""],
+["Lady Irwin College","Lady Irwin","Sikandra Road","Central",28.6290,77.2335,1,""],
+["College of Fine Arts","Fine Arts","Tilak Marg","Central",28.6238,77.2352,0,""],
+["Janki Devi Memorial College","JDMC","Rajendra Nagar","Central",28.6409,77.1833,1,""],
+["Shri Guru Nanak Dev Khalsa College","GND Khalsa","Dev Nagar","Central",28.6510,77.1880,0,""],
+["Kalindi College","Kalindi","East Patel Nagar","Central",28.6452,77.1658,1,""],
+["Dyal Singh College","Dyal Singh","Lodhi Road","Central",28.5921,77.2275,0,""],
+["Jesus and Mary College","Jesus & Mary","Chanakyapuri","Central",28.5964,77.1869,1,""],
+["Maitreyi College","Maitreyi","Chanakyapuri","Central",28.5915,77.1836,1,""],
+["Sri Venkateswara College","SVC","Dhaula Kuan","South",28.5890,77.1690,0,"S"],
+["Atma Ram Sanatan Dharma College","ARSD","Dhaula Kuan","South",28.5925,77.1710,0,"S"],
+["Motilal Nehru College","Motilal Nehru","Benito Juarez Marg","South",28.5903,77.1720,0,"S"],
+["Aryabhatta College","Aryabhatta","Benito Juarez Marg","South",28.5895,77.1737,0,"S"],
+["Delhi College of Arts and Commerce","DCAC","Netaji Nagar","South",28.5710,77.1752,0,""],
+["Lady Shri Ram College for Women","Lady Shri Ram","Lajpat Nagar","South",28.5677,77.2437,1,""],
+["Gargi College","Gargi","Siri Fort","South",28.5510,77.2180,1,""],
+["Kamala Nehru College","Kamala Nehru","August Kranti Marg","South",28.5565,77.2194,1,""],
+["Institute of Home Economics","Home Economics","Hauz Khas","South",28.5477,77.1950,1,""],
+["Shaheed Bhagat Singh College","Bhagat Singh","Sheikh Sarai","South",28.5390,77.2195,0,""],
+["College of Vocational Studies","Vocational Studies","Sheikh Sarai","South",28.5365,77.2185,0,""],
+["Sri Aurobindo College","Sri Aurobindo","Malviya Nagar","South",28.5333,77.2073,0,""],
+["Deshbandhu College","Deshbandhu","Kalkaji","South",28.5420,77.2587,0,""],
+["Ramanujan College","Ramanujan","Kalkaji","South",28.5380,77.2590,0,""],
+["Acharya Narendra Dev College","ANDC","Govindpuri","South",28.5336,77.2610,0,""],
+["PGDAV College","PGDAV","Nehru Nagar","South",28.5665,77.2530,0,""],
+["Shivaji College","Shivaji","Raja Garden","West",28.6482,77.1170,0,""],
+["Rajdhani College","Rajdhani","Raja Garden","West",28.6440,77.1210,0,""],
+["Deen Dayal Upadhyaya College","DDU","Karampura","West",28.6585,77.1410,0,""],
+["Shyama Prasad Mukherji College for Women","Shyama Prasad Mukherji","Punjabi Bagh","West",28.6692,77.1285,1,""],
+["Bharati College","Bharati","Janakpuri","West",28.6272,77.0818,1,""],
+["Bhaskaracharya College of Applied Sciences","Bhaskaracharya","Dwarka","West",28.5905,77.0431,0,""],
+["Bhagini Nivedita College","Bhagini Nivedita","Kair","West",28.5750,76.9480,1,""]
+];
+var VW=1100,VH=1080,KX=97.7*20,KY=110.57*20;
+function proj(lat,lng){return [(lng-76.84)*KX,(28.885-lat)*KY]}
+var COL=RAW.map(function(r){var p=proj(r[4],r[5]);return {name:r[0],short:r[1],area:r[2],zone:r[3],X:p[0],Y:p[1],w:r[6],grp:r[7]}});
+var GRPN={N:'DU North Campus',S:'DU South Campus'};
+var ZONES=['All','North','Central','South','West','East',"Women's",'Starred'];
+var OUTLINE=[[28.885,77.08],[28.875,77.16],[28.86,77.22],[28.78,77.25],[28.70,77.28],[28.66,77.31],[28.62,77.33],[28.57,77.32],[28.52,77.32],[28.46,77.31],[28.41,77.28],[28.40,77.22],[28.42,77.12],[28.46,77.07],[28.50,77.03],[28.55,76.99],[28.59,76.93],[28.63,76.87],[28.66,76.84],[28.70,76.85],[28.74,76.88],[28.80,76.88],[28.84,76.92],[28.87,77.02]];
+var YAMUNA=[[28.875,77.205],[28.82,77.235],[28.76,77.245],[28.72,77.250],[28.69,77.245],[28.665,77.245],[28.64,77.250],[28.61,77.260],[28.58,77.275],[28.55,77.300],[28.52,77.315],[28.48,77.320],[28.44,77.318]];
+var RIDGE=[[28.715,77.165],[28.690,77.195],[28.665,77.190],[28.640,77.170],[28.610,77.165],[28.570,77.150],[28.535,77.140],[28.500,77.110],[28.475,77.085]];
+var YELLOW=[[28.7479,77.1384],[28.7258,77.1627],[28.7075,77.1745],[28.6968,77.2072],[28.6945,77.2145],[28.6770,77.2250],[28.6675,77.2282],[28.6578,77.2306],[28.6420,77.2220],[28.6328,77.2197],[28.6143,77.2123],[28.5754,77.2099],[28.5668,77.2074],[28.5434,77.2067],[28.5223,77.2018],[28.5128,77.1855],[28.5069,77.1747],[28.4985,77.1612],[28.4930,77.1493],[28.4810,77.1260],[28.4750,77.1000],[28.4795,77.0805],[28.4723,77.0723],[28.4592,77.0725]];
+var BLUE=[[28.5523,77.0583],[28.5825,77.0494],[28.6100,77.0353],[28.6190,77.0330],[28.6290,77.0780],[28.6368,77.0970],[28.6492,77.1220],[28.6552,77.1430],[28.6425,77.1778],[28.6440,77.1880],[28.6328,77.2197],[28.6258,77.2342],[28.6233,77.2694],[28.6126,77.2773],[28.6043,77.2900],[28.5944,77.3028],[28.5850,77.3180],[28.5744,77.3562]];
+var BLUE2=[[28.6233,77.2694],[28.6305,77.2771],[28.6368,77.2943],[28.6413,77.2948],[28.6479,77.3062],[28.6469,77.3157]];
+var RED=[[28.7211,77.1070],[28.7078,77.1157],[28.7030,77.1320],[28.6965,77.1520],[28.6900,77.1650],[28.6730,77.1820],[28.6680,77.1970],[28.6700,77.2130],[28.6675,77.2282],[28.6700,77.2490],[28.6740,77.2700],[28.6745,77.2890],[28.6760,77.3200]];
+var VIOLET=[[28.6143,77.2123],[28.6004,77.2273],[28.5911,77.2339],[28.5836,77.2380],[28.5703,77.2370],[28.5540,77.2420],[28.5492,77.2518],[28.5496,77.2587],[28.5440,77.2644],[28.5290,77.2890],[28.4905,77.3030]];
+var STATIONS=[["Dwarka Sec 21",28.5523,77.0583],["Dwarka",28.6190,77.0330],["Noida City Centre",28.5744,77.3562],["Anand Vihar",28.6469,77.3157],["Rithala",28.7211,77.1070],["Dilshad Garden",28.6760,77.3200],["Samaypur Badli",28.7479,77.1384],["Badarpur",28.4905,77.3030],["Rajiv Chowk",28.6328,77.2197],["Yamuna Bank",28.6233,77.2694],["Kashmere Gate",28.6675,77.2282],["Central Secretariat",28.6143,77.2123],["HUDA City Centre (to Gurgaon)",28.4592,77.0725]];
+var DISTRICTS=[["Narela",28.845,77.10],["Rohini",28.715,77.115],["Najafgarh",28.62,76.96],["Dwarka",28.575,77.05],["Shahdara",28.655,77.29],["Saket",28.505,77.215],["Okhla",28.55,77.28],["Noida",28.60,77.375],["Gurgaon",28.43,77.03]];
+var POIS=[["Connaught Place",28.6315,77.2167],["India Gate",28.6129,77.2295],["Qutub Minar",28.5245,77.1855],["Lotus Temple",28.5535,77.2588],["IGI Airport",28.5562,77.1000]];
+
+/* ---------- state ---------- */
+var LS='workstation.v1';
+var S=null, docRef=null;
+function defaultLabels(){return [{id:'lb-event',name:'Event',c:2},{id:'lb-meet',name:'Meeting',c:4},{id:'lb-dead',name:'Deadline',c:3},{id:'lb-post',name:'Post',c:5},{id:'lb-idea',name:'Idea',c:1}]}
+function seed(){
+  var evc='cal-events',cnc='cal-content';
+  return {rev:0,starred:[],
+    todos:[
+      {id:uid(),text:'Shortlist venues near North Campus',tag:'',due:plusDays(3),done:false,ex:1},
+      {id:uid(),text:'Send sponsor deck to partners',tag:'',due:plusDays(5),done:false,ex:1},
+      {id:uid(),text:'Collect permission letter',tag:'Hindu College',due:plusDays(7),done:false,ex:1},
+      {id:uid(),text:'Book photographer',tag:'Miranda House',due:'',done:true,ex:1}],
+    cals:[{id:evc,name:'Event calendar',c:2,y:TODAY.getFullYear(),m:TODAY.getMonth()},{id:cnc,name:'Content calendar',c:5,y:TODAY.getFullYear(),m:TODAY.getMonth()}],
+    labels:defaultLabels(),
+    events:[
+      {id:uid(),cal:evc,d:plusDays(2),text:'Venue walkthrough',label:'lb-meet',ex:1},
+      {id:uid(),cal:evc,d:plusDays(6),text:'Fresher night',label:'lb-event',ex:1},
+      {id:uid(),cal:evc,d:plusDays(9),text:'Sponsor payment due',label:'lb-dead',ex:1},
+      {id:uid(),cal:cnc,d:plusDays(1),text:'Teaser reel',label:'lb-post',ex:1},
+      {id:uid(),cal:cnc,d:plusDays(3),text:'Poster drop',label:'lb-post',ex:1},
+      {id:uid(),cal:cnc,d:plusDays(7),text:'Recap carousel',label:'lb-post',ex:1},
+      {id:uid(),cal:cnc,d:plusDays(8),text:'Caption review',label:'lb-dead',ex:1}],
+    notes:[
+      {id:uid(),x:40,y:40,z:1,c:1,text:'Campus walk series: one college a week, shot on the same route',ex:1},
+      {id:uid(),x:290,y:70,z:2,c:2,text:'Collab with societies for the next event night',ex:1},
+      {id:uid(),x:80,y:260,z:3,c:3,text:'Printed map poster for freshers',ex:1},
+      {id:uid(),x:340,y:290,z:4,c:4,text:'Merch drop: tote + sticker pack?',ex:1}],
+    zc:5};
+}
+function normalize(x){
+  x=x&&typeof x==='object'?x:seed();
+  x.rev=+x.rev||0; x.starred=Array.isArray(x.starred)?x.starred:[]; x.todos=Array.isArray(x.todos)?x.todos:[];
+  x.cals=Array.isArray(x.cals)?x.cals:[]; x.labels=Array.isArray(x.labels)&&x.labels.length?x.labels:defaultLabels();
+  x.events=Array.isArray(x.events)?x.events:[]; x.notes=Array.isArray(x.notes)?x.notes:[]; x.zc=+x.zc||10;
+  return x;
+}
+function loadLocal(){try{var t=localStorage.getItem(LS);return t?JSON.parse(t):null}catch(_){return null}}
+function saveLocal(){try{localStorage.setItem(LS,JSON.stringify(S))}catch(_){}}
+var saveT=0,writing=false,again=false;
+function setStatus(k){
+  var el=$('#sync');el.dataset.k=k;
+  el.textContent=k==='synced'?'Saved to your account':k==='saving'?'Saving...':'Saved on this device only';
+}
+function commit(){
+  S.rev=Date.now(); saveLocal(); setStatus('saving');
+  clearTimeout(saveT); saveT=setTimeout(pushRemote,700);
+  updateChrome();
+}
+async function pushRemote(){
+  if(!docRef){setStatus('local');return}
+  if(writing){again=true;return}
+  writing=true;
+  try{await docRef.set({state:JSON.stringify(S),rev:S.rev});setStatus('synced')}catch(e){setStatus('local')}
+  writing=false;
+  if(again){again=false;pushRemote()}
+}
+async function initRemote(){
+  try{
+    if(!window.claude||!window.claude.use) return;
+    var db=await window.claude.use('db'), user=await window.claude.use('user');
+    if(!db||!user) return;
+    var id=await user.id(); if(!id) return;
+    docRef=db.doc('data/users/'+id+'/workstation');
+    var first=true;
+    var timer=setTimeout(function(){if(first)setStatus('local')},10000);
+    docRef.onSnapshot(function(snap){
+      if(snap.metadata.hasPendingWrites) return;
+      if(snap.exists){
+        var d=snap.data();
+        if(d&&typeof d.state==='string'&&(+d.rev||0)>S.rev){
+          try{S=normalize(JSON.parse(d.state));saveLocal();ui.cal=null;renderAll()}catch(_){}
+        }
+      }
+      if(!snap.metadata.fromCache){
+        first=false;clearTimeout(timer);
+        if(!snap.exists&&S.rev>0) pushRemote(); else setStatus('synced');
+      }
+    },function(){setStatus('local')});
+  }catch(_){}
+}
+
+/* ---------- ui state ---------- */
+var VIEWS=['map','todo','calendars','ideas'];
+var ui={view:'map',zone:'All',q:'',sel:null,tf:'all',cal:null,pm:{y:TODAY.getFullYear(),m:TODAY.getMonth()},nname:'',selDate:null,lab:null,newC:6,addLab:false,labC:6,delArm:false};
+
+function updateChrome(){
+  $('#cTodo').textContent=S.todos.filter(function(t){return !t.done}).length;
+  $('#cCal').textContent=S.cals.length;
+  $('#cIdea').textContent=S.notes.length;
+  var hasEx=S.todos.some(function(t){return t.ex})||S.events.some(function(t){return t.ex})||S.notes.some(function(t){return t.ex});
+  $('#clearEx').hidden=!hasEx;
+}
+function renderAll(){
+  updateChrome();
+  if(ui.view==='map') renderMapPanel();
+  if(ui.view==='todo') renderTodo();
+  if(ui.view==='calendars') renderCal();
+  if(ui.view==='ideas') renderIdeas();
+}
+function route(){
+  var hsh=(location.hash||'#map').slice(1);
+  ui.view=VIEWS.indexOf(hsh)>-1?hsh:'map';
+  VIEWS.forEach(function(v){
+    $('#v-'+v).hidden=(v!==ui.view);
+  });
+  document.querySelectorAll('.tab').forEach(function(t){t.setAttribute('aria-selected',String(t.dataset.v===ui.view))});
+  if(ui.view==='todo') ui.tSeen=new Set();
+  renderAll();
+  if(ui.view==='map'){
+    sizeMap();
+    if(ui.focusSel){var fc=ui.focusSel;ui.focusSel=null;ui.sel=fc;ui.zone='All';ui.q='';$('#q').value='';renderMapPanel();focusItems([fc],14)}
+  }
+}
+document.querySelectorAll('.tab').forEach(function(t){t.addEventListener('click',function(){location.hash=t.dataset.v})});
+window.addEventListener('hashchange',route);
+$('#clearEx').addEventListener('click',function(){
+  S.todos=S.todos.filter(function(t){return !t.ex});
+  S.events=S.events.filter(function(t){return !t.ex});
+  S.notes=S.notes.filter(function(t){return !t.ex});
+  commit();renderAll();toast('Example data cleared');
+});
+
+/* =====================  MAP  ===================== */
+var mv={k:1,tx:0,ty:0,w:0,h:0,fitK:1,user:false,raf:0,pend:0};
+var svg=$('#mapsvg'),world,markers,under,KMAX=26,GK=10;
+function buildMap(){
+  svg.textContent='';
+  var defs=s('defs',null,s('pattern',{id:'mg',width:48,height:48,patternUnits:'userSpaceOnUse'},s('path',{d:'M48 0H0V48',class:'m-grid'})));
+  var bg=s('rect',{class:'m-bg',x:0,y:0,width:'100%',height:'100%'});
+  var grid=s('rect',{x:0,y:0,width:'100%',height:'100%',fill:'url(#mg)'});
+  world=s('g',{id:'world'});
+  var pts=function(a){return a.map(function(p){var q=proj(p[0],p[1]);return q[0].toFixed(1)+','+q[1].toFixed(1)}).join(' ')};
+  world.append(s('polygon',{class:'m-land',points:pts(OUTLINE)}));
+  world.append(s('polyline',{class:'m-ridge',points:pts(RIDGE)}));
+  world.append(s('polyline',{class:'m-river',points:pts(YAMUNA)}));
+  [['yel',YELLOW],['vio',VIOLET],['red',RED],['blue',BLUE],['blue',BLUE2]].forEach(function(l){
+    world.append(s('polyline',{class:'m-line '+l[0],points:pts(l[1])}));
+  });
+  under=s('g',null);markers=s('g',null);
+  svg.append(defs,bg,grid,world,under,markers);
+}
+function sizeMap(){
+  var r=$('#mapwrap');var w=r.clientWidth,hh=r.clientHeight;
+  if(!w||!hh) return;
+  svg.setAttribute('viewBox','0 0 '+w+' '+hh);
+  var changed=(w!==mv.w||hh!==mv.h);
+  mv.w=w;mv.h=hh;mv.fitK=Math.min(w/(VW+60),hh/(VH+60));
+  if(!mv.user||mv.k<mv.fitK*0.85) fitAll(true); else if(changed) applyView();
+}
+function fitAll(now){
+  var k=mv.fitK,tx=(mv.w-VW*k)/2,ty=(mv.h-VH*k)/2;
+  if(now){mv.k=k;mv.tx=tx;mv.ty=ty;mv.user=false;applyView()} else {animateTo(k,tx,ty);mv.user=false}
+}
+function applyView(){
+  if(!mv.w) return;
+  world.setAttribute('transform','translate('+mv.tx+' '+mv.ty+') scale('+mv.k+')');
+  drawUnder();drawMarkers();
+}
+function schedule(){if(mv.pend) return;mv.pend=1;requestAnimationFrame(function(){mv.pend=0;applyView()})}
+function animateTo(k,tx,ty){
+  cancelAnimationFrame(mv.raf);
+  if(reduce){mv.k=k;mv.tx=tx;mv.ty=ty;applyView();return}
+  var k0=mv.k,x0=mv.tx,y0=mv.ty,t0=performance.now(),D=320;
+  var step=function(t){var p=Math.min(1,(t-t0)/D),e=1-Math.pow(1-p,3);
+    mv.k=k0+(k-k0)*e;mv.tx=x0+(tx-x0)*e;mv.ty=y0+(ty-y0)*e;applyView();
+    if(p<1) mv.raf=requestAnimationFrame(step)};
+  mv.raf=requestAnimationFrame(step);
+}
+function zoomAt(cx,cy,nk){
+  nk=clamp(nk,mv.fitK*0.85,KMAX);var f=nk/mv.k;
+  mv.tx=cx-(cx-mv.tx)*f;mv.ty=cy-(cy-mv.ty)*f;mv.k=nk;mv.user=true;schedule();
+}
+function focusItems(items,maxK){
+  if(!items.length){fitAll(false);return}
+  var x0=1e9,y0=1e9,x1=-1e9,y1=-1e9;
+  items.forEach(function(c){x0=Math.min(x0,c.X);x1=Math.max(x1,c.X);y0=Math.min(y0,c.Y);y1=Math.max(y1,c.Y)});
+  var bw=Math.max(x1-x0,1),bh=Math.max(y1-y0,1);
+  var k=Math.max(mv.fitK,Math.min(maxK,mv.w*0.6/bw,mv.h*0.6/bh));
+  var cx=(x0+x1)/2,cy=(y0+y1)/2;
+  animateTo(k,mv.w/2-cx*k,mv.h/2-cy*k);mv.user=true;
+}
+(function wirePan(){
+  var ptrs=new Map(),pan=null,pinch=null;
+  svg.addEventListener('pointerdown',function(e){
+    if(e.target.closest&&e.target.closest('[data-m]')) return;
+    try{svg.setPointerCapture(e.pointerId)}catch(_){}
+    ptrs.set(e.pointerId,{x:e.clientX,y:e.clientY});
+    if(ptrs.size===1){pan={x:e.clientX,y:e.clientY,tx:mv.tx,ty:mv.ty};svg.classList.add('drag');cancelAnimationFrame(mv.raf)}
+    else if(ptrs.size===2){var v=Array.from(ptrs.values());pinch={d:Math.hypot(v[0].x-v[1].x,v[0].y-v[1].y)||1,k:mv.k};pan=null}
+  });
+  svg.addEventListener('pointermove',function(e){
+    if(!ptrs.has(e.pointerId)) return;
+    ptrs.set(e.pointerId,{x:e.clientX,y:e.clientY});
+    if(ptrs.size===1&&pan){mv.tx=pan.tx+(e.clientX-pan.x);mv.ty=pan.ty+(e.clientY-pan.y);mv.user=true;schedule()}
+    else if(ptrs.size===2&&pinch){
+      var v=Array.from(ptrs.values()),d=Math.hypot(v[0].x-v[1].x,v[0].y-v[1].y)||1,r=svg.getBoundingClientRect();
+      zoomAt((v[0].x+v[1].x)/2-r.left,(v[0].y+v[1].y)/2-r.top,pinch.k*d/pinch.d);
+    }
+  });
+  var end=function(e){
+    ptrs.delete(e.pointerId);
+    if(ptrs.size<2) pinch=null;
+    if(ptrs.size===0){pan=null;svg.classList.remove('drag')}
+    else if(ptrs.size===1){var p=Array.from(ptrs.values())[0];pan={x:p.x,y:p.y,tx:mv.tx,ty:mv.ty}}
+  };
+  svg.addEventListener('pointerup',end);svg.addEventListener('pointercancel',end);
+  svg.addEventListener('wheel',function(e){
+    e.preventDefault();var r=svg.getBoundingClientRect();
+    zoomAt(e.clientX-r.left,e.clientY-r.top,mv.k*Math.exp(-e.deltaY*(e.ctrlKey?0.01:0.0016)));
+  },{passive:false});
+})();
+$('#zin').addEventListener('click',function(){zoomAt(mv.w/2,mv.h/2,mv.k*1.6)});
+$('#zout').addEventListener('click',function(){zoomAt(mv.w/2,mv.h/2,mv.k/1.6)});
+$('#zfit').addEventListener('click',function(){ui.sel=null;ui.zone='All';ui.q='';$('#q').value='';renderMapPanel();fitAll(false)});
+if(window.ResizeObserver) new ResizeObserver(function(){if(ui.view==='map') sizeMap()}).observe($('#mapwrap'));
+window.addEventListener('resize',function(){if(ui.view==='map') sizeMap()});
+
+function visible(){
+  var q=ui.q.trim().toLowerCase();
+  return COL.filter(function(c){
+    var zok=ui.zone==='All'||(ui.zone==='Starred'?S.starred.indexOf(c.name)>-1:ui.zone==="Women's"?!!c.w:c.zone===ui.zone);
+    var qok=!q||(c.name+' '+c.short+' '+c.area).toLowerCase().indexOf(q)>-1;
+    return zok&&qok;
+  });
+}
+function drawUnder(){
+  under.textContent='';
+  var k=mv.k;
+  var at=function(lat,lng){var q=proj(lat,lng);return [q[0]*k+mv.tx,q[1]*k+mv.ty]};
+  if(k<7) DISTRICTS.forEach(function(d){var p=at(d[1],d[2]);under.append(s('text',{class:'m-dist',x:p[0],y:p[1],text:d[0]}))});
+  STATIONS.forEach(function(t){
+    var p=at(t[1],t[2]);
+    if(p[0]<-20||p[0]>mv.w+20||p[1]<-20||p[1]>mv.h+20) return;
+    under.append(s('circle',{class:'m-sd',cx:p[0],cy:p[1],r:3.6}));
+    if(k<14) under.append(s('text',{class:'m-st',x:p[0]+7,y:p[1]+3.5,text:t[0]}));
+  });
+  POIS.forEach(function(t){
+    var p=at(t[1],t[2]);
+    if(p[0]<-20||p[0]>mv.w+20||p[1]<-20||p[1]>mv.h+20) return;
+    under.append(s('rect',{x:p[0]-3,y:p[1]-3,width:6,height:6,fill:'#8E9890',transform:'rotate(45 '+p[0]+' '+p[1]+')'}));
+    under.append(s('text',{class:'m-poi',x:p[0]+7,y:p[1]+3.5,text:t[0]}));
+  });
+}
+function place(x,y,w,hh,boxes){
+  var g=10,W=mv.w,H=mv.h;
+  var c=[[x+g,y-hh/2],[x-g-w,y-hh/2],[x-w/2,y-g-hh-2],[x-w/2,y+g],
+    [x+g-2,y-hh-g+2],[x+g-2,y+g-2],[x-g-w+2,y-hh-g+2],[x-g-w+2,y+g-2],
+    [x+g+14,y-hh-g-8],[x+g+14,y+g+6],[x-g-w-14,y-hh-g-8],[x-g-w-14,y+g+6]];
+  for(var i=0;i<c.length;i++){
+    var b=[c[i][0],c[i][1],c[i][0]+w,c[i][1]+hh];
+    if(b[0]<2||b[2]>W-2||b[1]<2||b[3]>H-2) continue;
+    var ok=true;
+    for(var j=0;j<boxes.length;j++){var o=boxes[j];if(b[0]<o[2]+2&&b[2]>o[0]-2&&b[1]<o[3]+2&&b[3]>o[1]-2){ok=false;break}}
+    if(ok) return b;
+  }
+  return null;
+}
+function leader(x,y,b,cls){
+  var lx=clamp(x,b[0],b[2]),ly=clamp(y,b[1],b[3]);
+  if(Math.hypot(lx-x,ly-y)<4) return null;
+  return s('line',{class:cls||'ld',x1:x,y1:y,x2:lx,y2:ly});
+}
+function drawMarkers(){
+  if(!markers) return;
+  markers.textContent='';
+  var W=mv.w,H=mv.h;
+  var pts=visible().map(function(c){return {c:c,x:c.X*mv.k+mv.tx,y:c.Y*mv.k+mv.ty}})
+    .filter(function(p){return p.x>-30&&p.x<W+30&&p.y>-30&&p.y<H+30});
+  var boxes=[],camps=[],singles=[],gp={N:[],S:[]};
+  pts.forEach(function(p){if(p.c.grp) gp[p.c.grp].push(p); else singles.push(p)});
+  ['N','S'].forEach(function(g){
+    var arr=gp[g];if(!arr.length) return;
+    var hasSel=arr.some(function(p){return p.c===ui.sel});
+    if(mv.k<GK&&!hasSel&&arr.length>1){
+      var cx=0,cy=0;arr.forEach(function(p){cx+=p.x;cy+=p.y});cx/=arr.length;cy/=arr.length;
+      var label=GRPN[g].toUpperCase()+' · '+arr.length,w=label.length*7.4+18,hh=24;
+      var b=place(cx,cy,w,hh,boxes);
+      if(b) boxes.push(b);
+      camps.push({g:g,x:cx,y:cy,b:b||[cx+12,cy-12,cx+12+w,cy+12],label:label,items:arr.map(function(p){return p.c})});
+    } else arr.forEach(function(p){singles.push(p)});
+  });
+  var rank=function(p){return (p.c===ui.sel?2:0)+(S.starred.indexOf(p.c.name)>-1?1:0)};
+  singles.sort(function(a,b){return rank(b)-rank(a)||a.y-b.y});
+  var full=mv.k>=14,placed=singles.map(function(p){
+    var label=full?p.c.name:p.c.short,w=label.length*5.9+14,hh=20;
+    var b=place(p.x,p.y,w,hh,boxes);if(b) boxes.push(b);
+    return {p:p,b:b,label:label};
+  });
+  camps.forEach(function(cp){
+    var focus=function(){focusItems(cp.items,16)};
+    var g=s('g',{class:'m-camp','data-m':'1',tabindex:'0',role:'button','aria-label':GRPN[cp.g]+', '+cp.items.length+' colleges, zoom in',onclick:focus,
+      onkeydown:function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();focus()}}});
+    var ld=leader(cp.x,cp.y,cp.b,'ld');if(ld) g.append(ld);
+    g.append(s('rect',{class:'bx',x:cp.b[0],y:cp.b[1],width:cp.b[2]-cp.b[0],height:cp.b[3]-cp.b[1],rx:2}));
+    g.append(s('text',{class:'bt',x:cp.b[0]+9,y:(cp.b[1]+cp.b[3])/2+.5,text:cp.label}));
+    g.append(s('rect',{class:'mk',x:cp.x-6,y:cp.y-6,width:12,height:12,transform:'rotate(45 '+cp.x+' '+cp.y+')'}));
+    markers.append(g);
+  });
+  for(var i=placed.length-1;i>=0;i--){
+    var it=placed[i],c=it.p.c,x=it.p.x,y=it.p.y,star=S.starred.indexOf(c.name)>-1,sel=(c===ui.sel);
+    var g=s('g',{class:'m-c'+(c.w?' w':'')+(star?' star':'')+(sel?' sel':''),'data-m':'1',tabindex:'0',role:'button','aria-label':c.name+', '+c.area,
+      onclick:(function(cc){return function(){selectCollege(cc,true)}})(c),
+      onkeydown:(function(cc){return function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();selectCollege(cc,true)}}})(c)},
+      s('title',{text:c.name}));
+    if(it.b){
+      var ld=leader(x,y,it.b,'ld');if(ld) g.append(ld);
+      g.append(s('rect',{class:'bx',x:it.b[0],y:it.b[1],width:it.b[2]-it.b[0],height:it.b[3]-it.b[1],rx:3}));
+      g.append(s('text',{class:'bt',x:it.b[0]+7,y:(it.b[1]+it.b[3])/2+.5,text:it.label}));
+    }
+    g.append(s('circle',{class:'dt',cx:x,cy:y,r:5}));
+    markers.append(g);
+  }
+}
+function selectCollege(c,zoom){
+  ui.sel=c;renderCard();renderList();
+  if(zoom) focusItems([c],Math.max(mv.k,14));else drawMarkers();
+  if(window.innerWidth<=900){var w=$('#mapwrap');if(w.getBoundingClientRect().top<0) w.scrollIntoView({block:'start',behavior:reduce?'auto':'smooth'})}
+}
+function toggleStar(c){
+  var i=S.starred.indexOf(c.name);
+  if(i>-1) S.starred.splice(i,1); else S.starred.push(c.name);
+  commit();renderCard();renderList();drawMarkers();
+}
+function renderCard(){
+  var box=$('#card');box.textContent='';
+  var c=ui.sel;
+  if(!c){box.append(h('div',{class:'card'},h('h3',{text:'Pick a college'}),h('p',{class:'sub',text:'Tap a tag on the map or choose one from the list. Yellow tags are the DU North and South campuses; tap one to zoom in.'})));return}
+  var star=S.starred.indexOf(c.name)>-1;
+  var inp=h('input',{type:'text',placeholder:'Add a to-do for this college','aria-label':'To-do for '+c.name});
+  box.append(h('div',{class:'card'},
+    h('div',null,h('h3',{text:c.name}),h('div',{class:'meta',text:c.area+' · '+c.zone+' · '+(c.w?'Women’s college':'Co-ed college')})),
+    h('div',{class:'row'},
+      h('button',{class:'btn',type:'button','aria-pressed':String(star),onclick:function(){toggleStar(c)},text:star?'Starred':'Star'}),
+      h('button',{class:'btn ghost',type:'button',onclick:function(){ui.sel=null;renderCard();renderList();drawMarkers()},text:'Close'})),
+    h('form',{onsubmit:function(e){e.preventDefault();var v=inp.value.trim();if(!v)return;
+      S.todos.unshift({id:uid(),text:v,tag:c.name,due:'',done:false});commit();inp.value='';toast('Added to your to-do list')}},
+      inp,h('button',{class:'btn primary',type:'submit',text:'Add'}))));
+}
+function renderList(){
+  var ul=$('#clist');ul.textContent='';
+  var vis=visible();
+  if(!vis.length){ul.append(h('li',null,h('div',{class:'empty',text:ui.zone==='Starred'&&!ui.q?'Nothing starred yet. Star a college to keep it here.':'No college matches that search.'})));}
+  vis.forEach(function(c){
+    var star=S.starred.indexOf(c.name)>-1;
+    ul.append(h('li',{class:(c===ui.sel?'on':'')+(c.w?' w':'')},
+      h('button',{class:'pick',type:'button',onclick:function(){selectCollege(c,true)}},h('span',{class:'nm',text:c.name}),h('span',{class:'ar',text:c.area+' · '+c.zone})),
+      h('button',{class:'st',type:'button','aria-pressed':String(star),'aria-label':(star?'Unstar ':'Star ')+c.name,onclick:function(){toggleStar(c)},text:star?'★':'☆'})));
+  });
+  $('#mapnote').textContent=vis.length+' of '+COL.length+' colleges shown. Positions are approximate and follow the reference map.';
+}
+function renderZones(){
+  var z=$('#zones');z.textContent='';
+  ZONES.forEach(function(n){z.append(h('button',{class:'chip',type:'button','aria-pressed':String(ui.zone===n),onclick:function(){ui.zone=n;onFilter()},text:n}))});
+}
+function onFilter(){
+  renderZones();renderList();
+  var vis=visible();
+  if(ui.zone==='All'&&!ui.q.trim()) fitAll(false); else focusItems(vis,10);
+  mv.user=false;
+}
+$('#q').addEventListener('input',function(e){ui.q=e.target.value;onFilter()});
+function renderMapPanel(){renderZones();renderCard();renderList();drawMarkers()}
+
+/* =====================  TO-DO  ===================== */
+function dueInfo(t){
+  if(t.done) return {cls:'done',txt:'Done'};
+  if(!t.due) return {cls:'none',txt:'No date set'};
+  var a=t.due.split('-').map(Number),d=new Date(a[0],a[1]-1,a[2]),n=new Date(TODAY.getFullYear(),TODAY.getMonth(),TODAY.getDate());
+  var diff=Math.round((d-n)/864e5);
+  if(diff<0) return {cls:'over',txt:'Overdue · '+(-diff)+(diff===-1?' day':' days')};
+  if(diff===0) return {cls:'soon',txt:'Due today'};
+  if(diff===1) return {cls:'soon',txt:'Tomorrow'};
+  if(diff<=3) return {cls:'soon',txt:'In '+diff+' days'};
+  return {cls:'later',txt:'In '+diff+' days'};
+}
+function delCard(el,t){
+  var go=function(){S.todos=S.todos.filter(function(x){return x!==t});commit();renderTodo()};
+  if(reduce){go();return}
+  el.classList.add('out');setTimeout(go,260);
+}
+function todoCard(t,i,enter){
+  var info=dueInfo(t),a=t.due?t.due.split('-').map(Number):null;
+  var col=t.tag?COL.find(function(c){return c.name===t.tag}):null;
+  var el=h('article',{class:'tcard '+info.cls+(enter?' enter':'')+(ui.jd===t.id?' pop':''),'data-id':t.id,style:'--i:'+Math.min(i,14)},
+    h('div',{class:'top'},
+      h('div',{class:'big',text:a?String(a[2]):'—'}),
+      h('div',{class:'mon',text:a?MONTHS[a[1]-1].slice(0,3)+' · '+DOWS[new Date(a[0],a[1]-1,a[2]).getDay()]:'Anytime'}),
+      h('div',{class:'status',text:info.txt})),
+    h('div',{class:'body'},
+      h('div',{class:'title',text:t.text}),
+      col?h('button',{class:'ctag'+(col.w?' w':''),type:'button',title:'Show on the map',onclick:function(){ui.focusSel=col;location.hash='map'},text:col.short+' · '+col.area}):(t.tag?h('span',{class:'ctag',text:t.tag}):null),
+      t.ex?h('span',{class:'exchip',text:'example'}):null),
+    h('div',{class:'foot'},
+      h('button',{class:'tick'+(t.done?' on':''),type:'button','aria-pressed':String(t.done),'aria-label':(t.done?'Reopen: ':'Mark done: ')+t.text,
+        onclick:function(){ui.jd=t.done?null:t.id;t.done=!t.done;commit();renderTodo();ui.jd=null}},h('span',{class:'ck'}),t.done?'Done':'Mark done'),
+      h('button',{class:'x',type:'button','aria-label':'Delete '+t.text,onclick:function(){delCard(el,t)},text:'×'})));
+  return el;
+}
+function renderTodo(){
+  var root=$('#v-todo');
+  var prev={};
+  root.querySelectorAll('.tcard[data-id]').forEach(function(el){prev[el.dataset.id]=el.getBoundingClientRect()});
+  root.textContent='';
+  var seen=ui.tSeen||(ui.tSeen=new Set());
+
+  var txt=h('input',{id:'ttext',type:'text',placeholder:'What needs doing?','aria-label':'New to-do'});
+  var tag=h('select',{id:'ttag','aria-label':'College (optional)'},h('option',{value:'',text:'No college'}),COL.map(function(c){return h('option',{value:c.name,text:c.short+' · '+c.area})}));
+  var due=h('input',{id:'tdue',type:'date','aria-label':'Due date'});
+  var addCard=h('form',{class:'tadd',onsubmit:function(e){e.preventDefault();var v=txt.value.trim();if(!v){txt.focus();return}
+    S.todos.unshift({id:uid(),text:v,tag:tag.value,due:due.value,done:false});commit();renderTodo();$('#ttext').focus()}},
+    h('div',{class:'plus',text:'New card'}),h('h3',{text:'Add a to-do'}),txt,tag,due,h('button',{class:'btn primary',type:'submit',text:'Add card'}));
+
+  var open=S.todos.filter(function(t){return !t.done}).length,done=S.todos.length-open,total=S.todos.length;
+  var pct=total?done/total:0,R=26,C=2*Math.PI*R;
+  var ring=s('svg',{class:'ring',viewBox:'0 0 64 64',width:64,height:64,'aria-hidden':'true'},
+    s('circle',{class:'rb',cx:32,cy:32,r:R}),
+    s('circle',{class:'rf',cx:32,cy:32,r:R,transform:'rotate(-90 32 32)','stroke-dasharray':C.toFixed(2),style:'--c:'+C.toFixed(2)+';--o:'+(C*(1-pct)).toFixed(2)}),
+    s('text',{x:32,y:33,text:Math.round(pct*100)+'%'}));
+  var head=h('div',{class:'thead'},ring,
+    h('div',{class:'grow'},h('h2',{class:'h2',text:'To-do'}),h('p',{class:'sub',text:open+' open, '+done+' done. Tag a card to a college and tap the tag to jump to it on the map.'})));
+
+  var counts={all:total,open:open,done:done};
+  var bar=h('div',{class:'tbar'},
+    h('div',{class:'chips',role:'group','aria-label':'Show'},['all','open','done'].map(function(f){
+      return h('button',{class:'chip',type:'button','aria-pressed':String(ui.tf===f),onclick:function(){ui.tf=f;renderTodo()},text:f[0].toUpperCase()+f.slice(1)+' '+counts[f]})})),
+    h('button',{class:'btn ghost',type:'button',disabled:done===0,onclick:function(){S.todos=S.todos.filter(function(t){return !t.done});commit();renderTodo()},text:'Clear completed'}));
+
+  var list=S.todos.filter(function(t){return ui.tf==='all'||(ui.tf==='open'?!t.done:t.done)}).sort(function(a,b){
+    if(a.done!==b.done) return a.done?1:-1;
+    if(a.due&&b.due) return a.due<b.due?-1:a.due>b.due?1:0;
+    return a.due?-1:b.due?1:0;});
+  var grid=h('div',{class:'tgrid'},addCard);
+  list.forEach(function(t,i){var enter=!seen.has(t.id);seen.add(t.id);grid.append(todoCard(t,i,enter))});
+  root.append(head,bar,grid);
+
+  if(!reduce) grid.querySelectorAll('.tcard[data-id]').forEach(function(el){
+    var o=prev[el.dataset.id];if(!o||!o.width) return;
+    var n=el.getBoundingClientRect(),dx=o.left-n.left,dy=o.top-n.top;
+    if(Math.abs(dx)<1&&Math.abs(dy)<1) return;
+    el.animate([{transform:'translate('+dx+'px,'+dy+'px)'},{transform:'none'}],{duration:460,easing:'cubic-bezier(.2,.8,.25,1)'});
+  });
+}
+
+/* =====================  CALENDARS  ===================== */
+function monthLabel(y,m){return MONTHS[m].slice(0,3)+' '+String(y).slice(2)}
+function optFor(y,m){var n=new Date(y,m+1,1);return {y:y,m:m,label:monthLabel(y,m)+' – '+monthLabel(n.getFullYear(),n.getMonth())}}
+function monthOpts(){var a=[],b=new Date(TODAY.getFullYear(),TODAY.getMonth()-6,1);for(var i=0;i<31;i++){var d=new Date(b.getFullYear(),b.getMonth()+i,1);a.push(optFor(d.getFullYear(),d.getMonth()))}return a}
+function monthCals(){return S.cals.filter(function(c){return c.y===ui.pm.y&&c.m===ui.pm.m})}
+function activeCal(){
+  var l=monthCals();var c=l.find(function(x){return x.id===ui.cal});
+  if(!c) c=l[0]||null;
+  ui.cal=c?c.id:null;return c;
+}
+function lab(id){return S.labels.find(function(l){return l.id===id})||S.labels[0]}
+function zig(){var n=30,a=[];for(var i=0;i<=n;i++) a.push((i/n*100).toFixed(2)+'% '+(i%2?'7px':'0px'));a.push('100% 100%','0% 100%');return 'polygon('+a.join(',')+')'}
+function setPm(y,m,anim){
+  while(m>11){m-=12;y++} while(m<0){m+=12;y--}
+  ui.pm={y:y,m:m};ui.selDate=null;ui.delArm=false;renderCal();
+  if(anim&&!reduce){var pg=$('.pad .page');if(pg) pg.classList.add('stick')}
+}
+function tearOff(name){
+  var old=$('.pad .page');var clone=(old&&!reduce)?old.cloneNode(true):null;
+  var c={id:uid(),name:name,c:ui.newC,y:ui.pm.y,m:ui.pm.m};
+  S.cals.push(c);ui.cal=c.id;ui.selDate=null;ui.nname='';commit();renderCal();
+  var np=$('.pad .page');
+  if(clone&&np){
+    clone.querySelectorAll('.ev,.more').forEach(function(n){n.remove()});
+    var ni=clone.querySelector('.nm');if(ni){if(ni.tagName==='INPUT') ni.value=name; else ni.textContent=name}
+    clone.classList.remove('stick');clone.classList.add('torn');
+    clone.style.cssText='position:absolute;left:0;right:0;top:'+np.offsetTop+'px;height:'+np.offsetHeight+'px;margin:0;z-index:6;pointer-events:none;clip-path:'+zig();
+    $('.pad').append(clone);
+    clone.addEventListener('animationend',function(){clone.remove()});
+    setTimeout(function(){clone.remove()},1100);
+  }
+  toast('Torn off: '+name+' ('+MONTHS[c.m]+' '+c.y+')');
+}
+function renderCal(){
+  var root=$('#v-calendars');root.textContent='';
+  var pm=ui.pm,mc=monthCals(),cal=activeCal();
+  var opts=monthOpts();
+  if(!opts.some(function(o){return o.y===pm.y&&o.m===pm.m})) opts.push(optFor(pm.y,pm.m));
+  var pick=h('select',{id:'mpick','aria-label':'Choose month',onchange:function(e){var a=e.target.value.split('-');setPm(+a[0],+a[1],true)}},
+    opts.map(function(o){return h('option',{value:o.y+'-'+o.m,text:o.label})}));
+  pick.value=pm.y+'-'+pm.m;
+  var nav=h('div',{class:'padbar'},pick,
+    h('button',{class:'btn',type:'button',onclick:function(){setPm(pm.y,pm.m-1,true)},text:'← Previous'}),
+    h('button',{class:'btn',type:'button',onclick:function(){setPm(TODAY.getFullYear(),TODAY.getMonth(),true)},text:'Today'}),
+    h('button',{class:'btn',type:'button',onclick:function(){setPm(pm.y,pm.m+1,true)},text:'Next →'}));
+
+  var shelf=h('div',{class:'shelf'},
+    mc.length?mc.map(function(c){return h('button',{class:'ctab'+(cal&&c.id===cal.id?' on':''),type:'button',style:'--c:var(--l'+c.c+')',onclick:function(){ui.cal=c.id;ui.selDate=null;ui.delArm=false;renderCal()},text:c.name})})
+      :h('span',{class:'sub',text:'No calendars for '+MONTHS[pm.m]+' '+pm.y+' yet. Name one below and tear it off the pad.'}));
+
+  var nm=h('input',{id:'ncname',type:'text',placeholder:'Name it, e.g. Event calendar',value:ui.nname,'aria-label':'Calendar name',oninput:function(e){ui.nname=e.target.value}});
+  var tear=h('form',{class:'newcal',onsubmit:function(e){e.preventDefault();var v=nm.value.trim();if(!v){nm.focus();toast('Name the calendar first');return}tearOff(v)}},
+    nm,
+    h('div',{class:'chips'},['Event calendar','Content calendar','Social','Personal'].map(function(n){return h('button',{class:'chip',type:'button',onclick:function(){nm.value=n;ui.nname=n;nm.focus()},text:n})})),
+    h('div',{class:'dots',role:'group','aria-label':'Calendar colour'},[1,2,3,4,5,6].map(function(n){return h('button',{class:'dot',type:'button',style:'--c:var(--l'+n+')','aria-pressed':String(ui.newC===n),'aria-label':'Colour '+n,onclick:function(){ui.newC=n;renderCal();$('#ncname').focus()}})})),
+    h('button',{class:'btn primary',type:'submit',text:'Tear off '+MONTHS[pm.m]+' page'}));
+
+  var first=new Date(pm.y,pm.m,1).getDay(),dim=new Date(pm.y,pm.m+1,0).getDate();
+  var evBy={};if(cal) S.events.forEach(function(e){if(e.cal===cal.id){(evBy[e.d]=evBy[e.d]||[]).push(e)}});
+  var inMonth=(TODAY.getFullYear()===pm.y&&TODAY.getMonth()===pm.m);
+  var sel=ui.selDate;
+  if(!sel||sel.slice(0,7)!==pm.y+'-'+p2(pm.m+1)) sel=inMonth?tkey:dkey(pm.y,pm.m,1);
+  ui.selDate=sel;
+  var cells=[];
+  for(var i=0;i<first;i++) cells.push(h('div',{class:'cell blank','aria-hidden':'true'}));
+  var mk=function(d){
+    var k=dkey(pm.y,pm.m,d),evs=evBy[k]||[],dw=(first+d-1)%7;
+    cells.push(h('button',{class:'cell'+(dw===0?' sun':'')+(k===tkey?' today':'')+(k===sel?' sel':''),type:'button','aria-label':longDate(k)+(evs.length?', '+evs.length+' item'+(evs.length>1?'s':''):''),
+      onclick:function(){ui.selDate=k;renderCal()}},
+      h('span',{class:'dn',text:String(d)}),
+      evs.slice(0,3).map(function(e){return h('span',{class:'ev',style:'--c:var(--l'+lab(e.label).c+')',text:e.text})}),
+      evs.length>3?h('span',{class:'more',text:'+'+(evs.length-3)}):null));
+  };
+  for(var d=1;d<=dim;d++) mk(d);
+  while(cells.length%7) cells.push(h('div',{class:'cell blank','aria-hidden':'true'}));
+
+  var nmEl=cal?h('input',{class:'nm',type:'text',value:cal.name,'aria-label':'Calendar name',onchange:function(e){var v=e.target.value.trim()||cal.name;cal.name=v;commit();renderCal()}})
+    :h('div',{class:'nm',text:'Blank page'});
+  var page=h('div',{class:'page',style:'--c:var(--l'+(cal?cal.c:6)+')'},
+    h('div',{class:'ph'},h('div',null,h('div',{class:'mo',text:MONTHS[pm.m]}),h('div',{class:'yr',text:String(pm.y)})),nmEl),
+    h('div',{class:'dow'},DOWS.map(function(n){return h('div',{text:n})})),
+    h('div',{class:'days'},cells));
+  var pad=h('div',{class:'padstage'},h('div',{class:'padback b2'}),h('div',{class:'padback b1'}),
+    h('div',{class:'pad'},h('div',{class:'binding','aria-hidden':'true'},h('span'),h('span'),h('span')),page));
+
+  var labels=h('div',{class:'labels'},h('span',{class:'sub',text:'Labels'}),
+    S.labels.map(function(l){return h('span',{class:'lab',style:'--c:var(--l'+l.c+')'},l.name,
+      h('button',{class:'x',type:'button',disabled:S.labels.length<2,'aria-label':'Delete label '+l.name,onclick:function(){
+        var rest=S.labels.filter(function(x){return x!==l});S.events.forEach(function(e){if(e.label===l.id)e.label=rest[0].id});S.labels=rest;if(ui.lab===l.id)ui.lab=null;commit();renderCal()},text:'×'}))}),
+    ui.addLab?null:h('button',{class:'btn',type:'button',onclick:function(){ui.addLab=true;renderCal();$('#lname').focus()},text:'+ Label'}));
+  if(ui.addLab){
+    var ln=h('input',{id:'lname',type:'text',placeholder:'Label name','aria-label':'Label name'});
+    labels.append(h('form',{class:'labform',onsubmit:function(e){e.preventDefault();var v=ln.value.trim();if(!v)return;
+      S.labels.push({id:uid(),name:v,c:ui.labC});ui.addLab=false;commit();renderCal()}},
+      ln,h('div',{class:'dots',role:'group','aria-label':'Label colour'},[1,2,3,4,5,6].map(function(n){return h('button',{class:'dot',type:'button',style:'--c:var(--l'+n+')','aria-pressed':String(ui.labC===n),'aria-label':'Colour '+n,onclick:function(){ui.labC=n;var v=ln.value;renderCal();$('#lname').value=v;$('#lname').focus()}})})),
+      h('button',{class:'btn primary',type:'submit',text:'Add'}),
+      h('button',{class:'btn ghost',type:'button',onclick:function(){ui.addLab=false;renderCal()},text:'Cancel'})));
+  }
+  var delBtn=cal?h('button',{class:'btn danger ghost',type:'button',onclick:function(){
+    if(!ui.delArm){ui.delArm=true;renderCal();return}
+    S.events=S.events.filter(function(e){return e.cal!==cal.id});S.cals=S.cals.filter(function(c){return c!==cal});ui.cal=null;ui.delArm=false;commit();renderCal()},
+    text:ui.delArm?'Really delete "'+cal.name+'"?':'Delete this calendar'}):null;
+
+  var day;
+  if(!cal){
+    day=h('aside',{class:'daypanel'},h('div',null,h('h3',{text:longDate(sel)}),h('p',{class:'sub',text:'Tear off the '+MONTHS[pm.m]+' page to start a calendar for this month, then click any day to add items. You can tear off the same month as many times as you like.'})));
+  } else {
+    var dayEvs=(evBy[sel]||[]);
+    var curLab=S.labels.some(function(l){return l.id===ui.lab})?ui.lab:S.labels[0].id;
+    var etx=h('input',{id:'evtext',type:'text',placeholder:'Add to '+longDate(sel),'aria-label':'New item'});
+    var sp=sel.split('-');
+    day=h('aside',{class:'daypanel'},
+      h('div',null,h('h3',{text:longDate(sel)}),h('p',{class:'sub',text:dayEvs.length?dayEvs.length+' on '+cal.name:'Nothing on '+cal.name+' yet'})),
+      dayEvs.length?h('ul',null,dayEvs.map(function(e){return h('li',{style:'--c:var(--l'+lab(e.label).c+')'},
+        h('span',{class:'t',text:e.text}),h('small',{text:lab(e.label).name}),e.ex?h('span',{class:'exchip',text:'example'}):null,
+        h('button',{class:'x',type:'button','aria-label':'Delete '+e.text,onclick:function(){S.events=S.events.filter(function(x){return x!==e});commit();renderCal()},text:'×'}))})):null,
+      h('form',{onsubmit:function(e){e.preventDefault();var v=etx.value.trim();if(!v)return;
+        S.events.push({id:uid(),cal:cal.id,d:sel,text:v,label:curLab});commit();renderCal();$('#evtext').focus()}},
+        etx,
+        h('div',{class:'pickl',role:'group','aria-label':'Label'},S.labels.map(function(l){return h('button',{type:'button',style:'--c:var(--l'+l.c+')','aria-pressed':String(l.id===curLab),onclick:function(){ui.lab=l.id;var v=etx.value;renderCal();$('#evtext').value=v;$('#evtext').focus()},text:l.name})})),
+        h('button',{class:'btn primary',type:'submit',text:'Add to '+DOWS[new Date(+sp[0],+sp[1]-1,+sp[2]).getDay()]+' '+(+sp[2])})));
+  }
+  root.append(nav,shelf,tear,h('div',{class:'cal-grid'},h('div',null,pad,labels,h('div',{style:'margin-top:12px'},delBtn)),day));
+}
+
+/* =====================  IDEAS  ===================== */
+function renderIdeas(){
+  var root=$('#v-ideas');root.textContent='';
+  var sheet=h('div',{class:'sheet'});
+  var board=h('div',{class:'board',id:'board'},sheet);
+  function noteEl(n){
+    var ta=h('textarea',{'aria-label':'Idea',placeholder:'Type an idea',value:n.text,maxlength:'600'});
+    var nh=h('div',{class:'nh'},
+      h('button',{class:'cdot',type:'button','aria-label':'Change colour',style:'background:var(--n'+n.c+')',onclick:function(e){e.stopPropagation();n.c=n.c%5+1;el.style.setProperty('--bg-n','var(--n'+n.c+')');e.currentTarget.style.background='var(--n'+n.c+')';commit()}}),
+      h('span',{class:'grip'}),
+      h('button',{type:'button','aria-label':'Delete note',onclick:function(e){e.stopPropagation();S.notes=S.notes.filter(function(x){return x!==n});commit();el.remove();updateChrome()},text:'×'}));
+    var el=h('div',{class:'note',style:'left:'+n.x+'px;top:'+n.y+'px;z-index:'+n.z+';--bg-n:var(--n'+n.c+')'},nh,ta);
+    var t=0;ta.addEventListener('input',function(){n.text=ta.value;clearTimeout(t);t=setTimeout(commit,500)});
+    var drag=null;
+    nh.addEventListener('pointerdown',function(e){
+      if(e.target.closest('button')) return;
+      nh.setPointerCapture(e.pointerId);nh.classList.add('go');
+      n.z=++S.zc;el.style.zIndex=n.z;
+      drag={x:e.clientX,y:e.clientY,nx:n.x,ny:n.y};
+    });
+    nh.addEventListener('pointermove',function(e){
+      if(!drag) return;
+      n.x=clamp(drag.nx+e.clientX-drag.x,0,1800-208);n.y=clamp(drag.ny+e.clientY-drag.y,0,1200-60);
+      el.style.left=n.x+'px';el.style.top=n.y+'px';
+    });
+    var up=function(){if(!drag) return;drag=null;nh.classList.remove('go');commit()};
+    nh.addEventListener('pointerup',up);nh.addEventListener('pointercancel',up);
+    return el;
+  }
+  S.notes.forEach(function(n){sheet.append(noteEl(n))});
+  var bar=h('div',{class:'itool'},
+    h('div',null,h('h2',{class:'h2',text:'Idea board'}),h('p',{class:'sub',text:'Drag a note by its top strip. The dot changes its colour.'})),
+    h('span',{class:'sp'}),
+    h('button',{class:'btn primary',type:'button',onclick:function(){
+      var n={id:uid(),x:Math.round(board.scrollLeft+30+Math.random()*120),y:Math.round(board.scrollTop+30+Math.random()*100),z:++S.zc,c:(S.notes.length%5)+1,text:''};
+      S.notes.push(n);commit();var el=noteEl(n);sheet.append(el);el.querySelector('textarea').focus()},text:'+ Note'}));
+  root.append(bar,board);
+}
+
+/* ---------- boot ---------- */
+S=normalize(loadLocal()||seed());
+$('#today').textContent=TODAY.toLocaleDateString('en-IN',{weekday:'short',day:'numeric',month:'short'});
+buildMap();
+route();
+initRemote();
+})();
+</script>
+
+</body></html>
