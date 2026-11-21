@@ -1,6 +1,9 @@
-<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
-<title>unrest</title>
-<meta name="claude:viewport-fit-sides" content="cover">
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Workstation</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&family=Instrument+Sans:wght@400..700&family=DM+Mono:wght@400;500&display=swap">
 <style>
 /* Layout: a drafting desk on black. One rail with four tabs; each tab is a sheet.
@@ -185,6 +188,12 @@ button.ctag:hover{background:var(--line)}
 @keyframes stamp{from{opacity:0;transform:rotate(-12deg) scale(2.6)}to{opacity:.85;transform:rotate(-12deg) scale(1)}}
 @keyframes viewIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
 .view:not([hidden]){animation:viewIn .42s cubic-bezier(.2,.8,.25,1) both}
+.by{font:500 10.5px var(--f-mono);color:var(--ink2);overflow:hidden;white-space:nowrap;text-overflow:ellipsis;max-width:72px;margin:0 6px}
+.gate{position:fixed;inset:0;background:rgba(0,0,0,.88);display:flex;align-items:center;justify-content:center;z-index:100;padding:16px}
+.gate[hidden]{display:none}
+.gcard{background:var(--surface);border:1px solid var(--line);padding:22px;width:min(380px,100%);display:grid;gap:8px}
+.gcard label{font:600 12px var(--f-mono);letter-spacing:.06em;text-transform:uppercase;color:var(--ink2);margin-top:4px}
+.gerr{color:var(--danger);min-height:1.3em;margin:0;font-size:13px}
 .x{appearance:none;background:none;border:0;color:var(--ink2);font-size:20px;line-height:1;cursor:pointer;padding:0 4px}
 .x:hover{color:var(--danger)}
 
@@ -263,7 +272,7 @@ button.ctag:hover{background:var(--line)}
 .note{position:absolute;width:208px;background:var(--bg-n,var(--n1));border:1px solid color-mix(in srgb,var(--ink) 22%,transparent);box-shadow:3px 4px 0 color-mix(in srgb,var(--ink) 16%,transparent);display:flex;flex-direction:column}
 .nh{height:26px;display:flex;align-items:center;justify-content:space-between;padding:0 4px 0 6px;cursor:grab;touch-action:none;background:color-mix(in srgb,var(--ink) 9%,transparent)}
 .nh.go{cursor:grabbing}
-.nh .grip{flex:1;height:100%}
+.nh .grip{flex:1;height:100%;display:flex;align-items:center;padding-left:6px;font:500 10px var(--f-mono);color:var(--ink2);overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
 .nh button{appearance:none;background:none;border:0;cursor:pointer;color:var(--ink2);font-size:17px;line-height:1;padding:0 5px}
 .nh .cdot{width:14px;height:14px;border-radius:50%;border:2px solid var(--ink2);padding:0;margin:0 4px}
 .nf{display:flex;align-items:center;gap:8px;padding:6px 8px;border-top:1px solid color-mix(in srgb,var(--ink) 16%,transparent);flex-wrap:wrap;min-height:36px}
@@ -310,16 +319,25 @@ button.ctag:hover{background:var(--line)}
   .tcard,.tcard:hover{transition:none}
 }
 </style>
+<style>
+:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+[hidden]{display:none!important}
+html{-webkit-text-size-adjust:100%}
+img{max-width:100%}
+</style>
+</head>
+<body>
 
 <div class="wrap">
   <header class="top">
     <div class="brand">
-      <h1><span class="mark" aria-hidden="true"></span>unrest</h1>
+      <h1><span class="mark" aria-hidden="true"></span>Workstation</h1>
       <span id="today" class="mono"></span>
     </div>
     <div class="top-r">
       <button id="clearEx" class="btn ghost" type="button" hidden>Clear example data</button>
-      <span id="sync" class="sync" data-k="local" role="status">Saved on this device only</span>
+      <button id="signout" class="btn ghost" type="button" hidden>Switch user</button>
+      <span id="sync" class="sync" data-k="local" role="status">Not connected, saved on this device only</span>
     </div>
   </header>
 
@@ -367,6 +385,18 @@ button.ctag:hover{background:var(--line)}
   <section id="v-todo" class="view" aria-label="To-do list" hidden></section>
   <section id="v-calendars" class="view" aria-label="Calendars" hidden></section>
   <section id="v-board" class="view" aria-label="Board" hidden></section>
+</div>
+<div id="gate" class="gate" hidden>
+  <form id="gform" class="gcard">
+    <h2 class="h2">Join the workstation</h2>
+    <p class="sub">Enter your name, so teammates can see who added what, and the team passcode.</p>
+    <label for="gname">Your name</label>
+    <input id="gname" type="text" autocomplete="name">
+    <label for="gpass">Passcode</label>
+    <input id="gpass" type="password" autocomplete="current-password">
+    <p id="gerr" class="gerr" role="alert"></p>
+    <button id="gbtn" class="btn primary" type="submit">Connect</button>
+  </form>
 </div>
 <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
@@ -491,90 +521,173 @@ var STATIONS=[["Dwarka Sec 21",28.5523,77.0583],["Dwarka",28.6190,77.0330],["Noi
 var DISTRICTS=[["Narela",28.845,77.10],["Rohini",28.715,77.115],["Najafgarh",28.62,76.96],["Dwarka",28.575,77.05],["Shahdara",28.655,77.29],["Saket",28.505,77.215],["Okhla",28.55,77.28],["Noida",28.60,77.375],["Gurgaon",28.43,77.03]];
 var POIS=[["Connaught Place",28.6315,77.2167],["India Gate",28.6129,77.2295],["Qutub Minar",28.5245,77.1855],["Lotus Temple",28.5535,77.2588],["IGI Airport",28.5562,77.1000]];
 
-/* ---------- state ---------- */
-var LS='unrest.v1';
-var S=null, docRef=null;
+/* ---------- state + Google Sheets sync ---------- */
+/* Paste your Apps Script web app URL here (see SETUP.md). Leave as is to run on this device only. */
+var API_URL='PASTE_YOUR_WEB_APP_URL_HERE';
+var POLL_MS=10000;
+var CONFIGURED=/^https:\/\/script\.google\.com\//.test(API_URL);
+var LS='workstation.v2';
+var KINDS=['todos','notes','events','cals','labels','boards'];
+var S=null;
+var sync={on:false,base:{},since:0,pass:'',name:'',pushT:0,busy:false,again:false,pulling:false,timer:0,pending:false,wired:false};
+
 function defaultLabels(){return [{id:'lb-event',name:'Event',c:2},{id:'lb-meet',name:'Meeting',c:4},{id:'lb-dead',name:'Deadline',c:3},{id:'lb-post',name:'Post',c:5},{id:'lb-idea',name:'Idea',c:1}]}
-function seed(){
-  var evc='cal-events',cnc='cal-content';
-  return {rev:0,starred:[],
-    todos:[
-      {id:uid(),text:'Shortlist venues near North Campus',tag:'',due:plusDays(3),done:false,ex:1},
-      {id:uid(),text:'Send sponsor deck to partners',tag:'',due:plusDays(5),done:false,ex:1},
-      {id:uid(),text:'Collect permission letter',tag:'Hindu College',due:plusDays(7),done:false,ex:1},
-      {id:uid(),text:'Book photographer',tag:'Miranda House',due:'',done:true,ex:1}],
-    cals:[{id:evc,name:'Event calendar',c:2,y:TODAY.getFullYear(),m:TODAY.getMonth()},{id:cnc,name:'Content calendar',c:5,y:TODAY.getFullYear(),m:TODAY.getMonth()}],
-    labels:defaultLabels(),
-    events:[
-      {id:uid(),cal:evc,d:plusDays(2),text:'Venue walkthrough',label:'lb-meet',ex:1},
-      {id:uid(),cal:evc,d:plusDays(6),text:'Fresher night',label:'lb-event',ex:1},
-      {id:uid(),cal:evc,d:plusDays(9),text:'Sponsor payment due',label:'lb-dead',ex:1},
-      {id:uid(),cal:cnc,d:plusDays(1),text:'Teaser reel',label:'lb-post',ex:1},
-      {id:uid(),cal:cnc,d:plusDays(3),text:'Poster drop',label:'lb-post',ex:1},
-      {id:uid(),cal:cnc,d:plusDays(7),text:'Recap carousel',label:'lb-post',ex:1},
-      {id:uid(),cal:cnc,d:plusDays(8),text:'Caption review',label:'lb-dead',ex:1}],
-    boards:[{id:'bd-content',name:'Content board',kind:'content'},{id:'bd-event',name:'Event board',kind:'event'}],
-    notes:[
-      {id:uid(),b:'bd-content',st:'final',x:40,y:40,z:1,c:5,text:'Campus walk series: one college a week, shot on the same route',ex:1},
-      {id:uid(),b:'bd-content',st:'idea',x:290,y:60,z:2,c:2,text:'Reel format: 15-second college tours',ex:1},
-      {id:uid(),b:'bd-content',st:'idea',x:70,y:290,z:3,c:4,text:'Caption bank for event nights',ex:1},
-      {id:uid(),b:'bd-event',st:'final',x:40,y:40,z:4,c:1,text:'Open-mic night at North Campus',ex:1},
-      {id:uid(),b:'bd-event',st:'idea',x:290,y:70,z:5,c:3,text:'Collab with societies for a joint event night',ex:1},
-      {id:uid(),b:'bd-event',st:'idea',x:90,y:290,z:6,c:5,text:'Merch drop with a pop-up stall',ex:1}],
-    zc:5};
-}
+function defaultBoards(){return [{id:'bd-content',name:'Content board',kind:'content'},{id:'bd-event',name:'Event board',kind:'event'}]}
+function seed(){return {rev:0,starred:[],todos:[],cals:[],labels:defaultLabels(),events:[],notes:[],boards:defaultBoards(),zc:5}}
 function normalize(x){
   x=x&&typeof x==='object'?x:seed();
-  x.rev=+x.rev||0; x.starred=Array.isArray(x.starred)?x.starred:[]; x.todos=Array.isArray(x.todos)?x.todos:[];
-  x.cals=Array.isArray(x.cals)?x.cals:[]; x.labels=Array.isArray(x.labels)&&x.labels.length?x.labels:defaultLabels();
-  x.events=Array.isArray(x.events)?x.events:[]; x.notes=Array.isArray(x.notes)?x.notes:[]; x.zc=+x.zc||10;
-  if(!Array.isArray(x.boards)||!x.boards.length) x.boards=[{id:'bd-content',name:'Content board',kind:'content'},{id:'bd-event',name:'Event board',kind:'event'}];
+  x.rev=+x.rev||0;x.starred=Array.isArray(x.starred)?x.starred:[];
+  KINDS.forEach(function(k){x[k]=Array.isArray(x[k])?x[k]:[]});
+  if(!x.labels.length) x.labels=defaultLabels();
+  if(!x.boards.length) x.boards=defaultBoards();
   x.notes.forEach(function(n){if(!n.b||!x.boards.some(function(b){return b.id===n.b})) n.b=x.boards[0].id;if(!n.st) n.st='idea'});
+  x.zc=Math.max(+x.zc||5,x.notes.reduce(function(m,n){return Math.max(m,+n.z||0)},0));
   return x;
 }
-function loadLocal(){try{var t=localStorage.getItem(LS);return t?JSON.parse(t):null}catch(_){return null}}
-function saveLocal(){try{localStorage.setItem(LS,JSON.stringify(S))}catch(_){}}
-var saveT=0,writing=false,again=false;
+function lget(k){try{return localStorage.getItem(k)}catch(_){return null}}
+function lset(k,v){try{localStorage.setItem(k,v)}catch(_){}}
+function loadLocal(){var t=lget(LS);try{return t?JSON.parse(t):null}catch(_){return null}}
+function saveLocal(){lset(LS,JSON.stringify(S));lset(LS+'.sync',JSON.stringify({base:sync.base,since:sync.since}))}
 function setStatus(k){
   var el=$('#sync');el.dataset.k=k;
-  el.textContent=k==='synced'?'Saved to your account':k==='saving'?'Saving...':'Saved on this device only';
+  el.textContent=k==='synced'?'Synced with the team sheet':k==='saving'?'Syncing...':k==='error'?'Cannot reach the sheet, retrying':'Not connected, saved on this device only';
 }
 function commit(){
-  S.rev=Date.now(); saveLocal(); setStatus('saving');
-  clearTimeout(saveT); saveT=setTimeout(pushRemote,700);
-  updateChrome();
+  S.rev=Date.now();saveLocal();updateChrome();
+  if(sync.on){setStatus('saving');clearTimeout(sync.pushT);sync.pushT=setTimeout(pushNow,800)}
 }
-async function pushRemote(){
-  if(!docRef){setStatus('local');return}
-  if(writing){again=true;return}
-  writing=true;
-  try{await docRef.set({state:JSON.stringify(S),rev:S.rev});setStatus('synced')}catch(e){setStatus('local')}
-  writing=false;
-  if(again){again=false;pushRemote()}
+
+/* --- transport --- */
+function api(body){
+  return fetch(API_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(body)}).then(function(r){return r.json()});
 }
-async function initRemote(){
+function computeChanges(){
+  var cur={},ch=[];
+  KINDS.forEach(function(k){S[k].forEach(function(it){cur[k+':'+it.id]={kind:k,it:it}})});
+  Object.keys(cur).forEach(function(key){
+    var o=cur[key],j=JSON.stringify(o.it);
+    if(sync.base[key]!==j){
+      o.it.by=sync.name;o.it.at=Date.now();j=JSON.stringify(o.it);
+      ch.push({kind:o.kind,id:o.it.id,json:j,d:0});
+    }
+  });
+  Object.keys(sync.base).forEach(function(key){
+    if(!cur[key]){var i=key.indexOf(':');ch.push({kind:key.slice(0,i),id:key.slice(i+1),json:'',d:1})}
+  });
+  return ch;
+}
+async function pushNow(){
+  if(!sync.on) return;
+  if(sync.busy){sync.again=true;return}
+  var ch=computeChanges();
+  if(!ch.length){setStatus('synced');return}
+  sync.busy=true;setStatus('saving');
   try{
-    if(!window.claude||!window.claude.use) return;
-    var db=await window.claude.use('db'), user=await window.claude.use('user');
-    if(!db||!user) return;
-    var id=await user.id(); if(!id) return;
-    docRef=db.doc('data/users/'+id+'/unrest');
-    var first=true;
-    var timer=setTimeout(function(){if(first)setStatus('local')},10000);
-    docRef.onSnapshot(function(snap){
-      if(snap.metadata.hasPendingWrites) return;
-      if(snap.exists){
-        var d=snap.data();
-        if(d&&typeof d.state==='string'&&(+d.rev||0)>S.rev){
-          try{S=normalize(JSON.parse(d.state));saveLocal();ui.cal=null;renderAll()}catch(_){}
-        }
-      }
-      if(!snap.metadata.fromCache){
-        first=false;clearTimeout(timer);
-        if(!snap.exists&&S.rev>0) pushRemote(); else setStatus('synced');
-      }
-    },function(){setStatus('local')});
-  }catch(_){}
+    var r=await api({a:'push',pass:sync.pass,changes:ch});
+    if(!r.ok){if(r.err==='unauthorized'){lockOut()}throw new Error(r.err||'push failed')}
+    ch.forEach(function(c){var key=c.kind+':'+c.id;if(c.d) delete sync.base[key];else sync.base[key]=c.json});
+    saveLocal();setStatus('synced');
+  }catch(e){
+    setStatus('error');clearTimeout(sync.pushT);sync.pushT=setTimeout(pushNow,5000);
+  }
+  sync.busy=false;
+  if(sync.again){sync.again=false;pushNow()}
+}
+function applyRemote(items){
+  var changed=false;
+  items.forEach(function(row){
+    var key=row.kind+':'+row.id,arr=S[row.kind];
+    if(!arr) return;
+    var idx=-1;for(var i=0;i<arr.length;i++){if(arr[i].id===row.id){idx=i;break}}
+    var localJ=idx>-1?JSON.stringify(arr[idx]):null;
+    var hasBase=sync.base[key]!==undefined;
+    if(row.d){
+      if(idx>-1&&!(hasBase&&localJ!==sync.base[key])){arr.splice(idx,1);changed=true}
+      delete sync.base[key];return;
+    }
+    if(idx===-1&&hasBase) return;
+    if(idx>-1&&(!hasBase||localJ!==sync.base[key])){
+      if(!hasBase&&localJ===row.json) sync.base[key]=row.json;
+      return;
+    }
+    if(idx>-1&&localJ===row.json){sync.base[key]=row.json;return}
+    var obj;try{obj=JSON.parse(row.json)}catch(_){return}
+    if(idx>-1) arr[idx]=obj;else arr.push(obj);
+    sync.base[key]=row.json;changed=true;
+  });
+  if(changed) S=normalize(S);
+  return changed;
+}
+async function pull(){
+  if(!sync.on||sync.pulling) return;
+  sync.pulling=true;
+  try{
+    var r=await api({a:'pull',pass:sync.pass,since:sync.since});
+    if(!r.ok){if(r.err==='unauthorized'){lockOut();sync.pulling=false;return}throw new Error(r.err||'pull failed')}
+    var changed=applyRemote(r.items||[]);
+    sync.since=Math.max(sync.since,+r.max||0);
+    saveLocal();
+    if(changed){updateChrome();softRender()}
+    if(!sync.busy) setStatus('synced');
+  }catch(e){setStatus('error')}
+  sync.pulling=false;
+}
+function typing(){
+  var a=document.activeElement;
+  return !!(a&&/^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName)&&a.closest&&a.closest('#v-todo,#v-calendars,#v-board'));
+}
+function softRender(){
+  if(window.__drag||typing()){sync.pending=true;return}
+  sync.pending=false;renderAll();
+}
+document.addEventListener('focusout',function(){if(sync.pending) setTimeout(function(){if(sync.pending) softRender()},250)});
+
+/* --- passcode gate --- */
+function showGate(msg){
+  var g=$('#gate');g.hidden=false;$('#gerr').textContent=msg||'';
+  var n=$('#gname');n.value=lget(LS+'.name')||'';$('#gpass').value='';
+  (n.value?$('#gpass'):n).focus();
+}
+function lockOut(){
+  sync.on=false;clearInterval(sync.timer);lset(LS+'.pass','');
+  showGate('The passcode was changed or is wrong. Enter it again.');
+}
+async function connect(name,pass){
+  try{
+    var r=await api({a:'ping',pass:pass});
+    if(!r.ok) return r.err==='unauthorized'?'That passcode is not right.':'Could not connect ('+(r.err||'unknown')+').';
+  }catch(e){return 'Could not reach the sheet. Check the web app URL and your connection.'}
+  sync.pass=pass;sync.name=name;lset(LS+'.pass',pass);lset(LS+'.name',name);
+  return '';
+}
+function beginPolling(){
+  sync.on=true;$('#signout').hidden=false;setStatus('saving');
+  pull().then(function(){pushNow()});
+  clearInterval(sync.timer);
+  sync.timer=setInterval(function(){if(!document.hidden) pull()},POLL_MS);
+  if(!sync.wired){
+    sync.wired=true;
+    document.addEventListener('visibilitychange',function(){if(!document.hidden&&sync.on) pull()});
+  }
+}
+function startSync(){
+  if(!CONFIGURED){setStatus('local');return}
+  var sc=lget(LS+'.sync');
+  if(sc){try{var o=JSON.parse(sc);sync.base=o.base||{};sync.since=+o.since||0}catch(_){}}
+  $('#gform').addEventListener('submit',async function(e){
+    e.preventDefault();
+    var nm=$('#gname').value.trim(),ps=$('#gpass').value;
+    if(!nm||!ps){$('#gerr').textContent='Enter your name and the passcode.';return}
+    $('#gbtn').disabled=true;$('#gerr').textContent='Connecting...';
+    var err=await connect(nm,ps);
+    $('#gbtn').disabled=false;
+    if(err){$('#gerr').textContent=err;return}
+    $('#gate').hidden=true;beginPolling();
+  });
+  $('#signout').addEventListener('click',function(){lset(LS+'.pass','');location.reload()});
+  var pass=lget(LS+'.pass'),name=lget(LS+'.name');
+  if(pass&&name){sync.pass=pass;sync.name=name;beginPolling()}
+  else showGate('');
 }
 
 /* ---------- ui state ---------- */
@@ -892,6 +1005,7 @@ function todoCard(t,i,enter){
     h('div',{class:'foot'},
       h('button',{class:'tick'+(t.done?' on':''),type:'button','aria-pressed':String(t.done),'aria-label':(t.done?'Reopen: ':'Mark done: ')+t.text,
         onclick:function(){ui.jd=t.done?null:t.id;t.done=!t.done;commit();renderTodo();ui.jd=null}},h('span',{class:'ck'}),t.done?'Done':'Mark done'),
+      t.by?h('span',{class:'by',text:t.by}):null,
       h('button',{class:'x',type:'button','aria-label':'Delete '+t.text,onclick:function(){delCard(el,t)},text:'×'})));
   return el;
 }
@@ -1054,7 +1168,7 @@ function renderCal(){
     day=h('aside',{class:'daypanel'},
       h('div',null,h('h3',{text:longDate(sel)}),h('p',{class:'sub',text:dayEvs.length?dayEvs.length+' on '+cal.name:'Nothing on '+cal.name+' yet'})),
       dayEvs.length?h('ul',null,dayEvs.map(function(e){return h('li',{style:'--c:var(--l'+lab(e.label).c+')'},
-        h('span',{class:'t',text:e.text}),h('small',{text:lab(e.label).name}),e.ex?h('span',{class:'exchip',text:'example'}):null,
+        h('span',{class:'t',text:e.text}),h('small',{text:lab(e.label).name+(e.by?' \u00B7 '+e.by:'')}),e.ex?h('span',{class:'exchip',text:'example'}):null,
         h('button',{class:'x',type:'button','aria-label':'Delete '+e.text,onclick:function(){S.events=S.events.filter(function(x){return x!==e});commit();renderCal()},text:'×'}))})):null,
       h('form',{onsubmit:function(e){e.preventDefault();var v=etx.value.trim();if(!v)return;
         S.events.push({id:uid(),cal:cal.id,d:sel,text:v,label:curLab});commit();renderCal();$('#evtext').focus()}},
@@ -1098,7 +1212,7 @@ function renderIdeas(){
     var ta=h('textarea',{'aria-label':'Idea',placeholder:'Type an idea',value:n.text,maxlength:'600'});
     var nh=h('div',{class:'nh'},
       h('button',{class:'cdot',type:'button','aria-label':'Change colour',style:'background:var(--n'+n.c+')',onclick:function(e){e.stopPropagation();n.c=n.c%5+1;el.style.setProperty('--bg-n','var(--n'+n.c+')');e.currentTarget.style.background='var(--n'+n.c+')';commit()}}),
-      h('span',{class:'grip'}),
+      h('span',{class:'grip',text:n.by||''}),
       h('button',{type:'button','aria-label':'Delete note',onclick:function(e){e.stopPropagation();S.notes=S.notes.filter(function(x){return x!==n});commit();renderIdeas()},text:'×'}));
     var foot=h('div',{class:'nf'});
     var el=h('div',{class:'note',style:'left:'+n.x+'px;top:'+n.y+'px;z-index:'+n.z+';--bg-n:var(--n'+n.c+')'},nh,ta,foot);
@@ -1187,14 +1301,14 @@ function renderIdeas(){
       if(e.target.closest('button')) return;
       nh.setPointerCapture(e.pointerId);nh.classList.add('go');
       n.z=++S.zc;el.style.zIndex=n.z;
-      drag={x:e.clientX,y:e.clientY,nx:n.x,ny:n.y};
+      drag={x:e.clientX,y:e.clientY,nx:n.x,ny:n.y};window.__drag=true;
     });
     nh.addEventListener('pointermove',function(e){
       if(!drag) return;
       n.x=clamp(drag.nx+e.clientX-drag.x,0,1800-208);n.y=clamp(drag.ny+e.clientY-drag.y,0,1200-90);
       el.style.left=n.x+'px';el.style.top=n.y+'px';
     });
-    var up=function(){if(!drag) return;drag=null;nh.classList.remove('go');commit()};
+    var up=function(){if(!drag) return;drag=null;window.__drag=false;nh.classList.remove('go');commit()};
     nh.addEventListener('pointerup',up);nh.addEventListener('pointercancel',up);
     return el;
   }
@@ -1236,8 +1350,9 @@ S=normalize(loadLocal()||seed());
 $('#today').textContent=TODAY.toLocaleDateString('en-IN',{weekday:'short',day:'numeric',month:'short'});
 buildMap();
 route();
-initRemote();
+startSync();
 })();
 </script>
 
-</body></html>
+</body>
+</html>
